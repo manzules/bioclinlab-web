@@ -47,19 +47,6 @@
             height: 5px;
             background: linear-gradient(90deg, var(--primary-blue), var(--primary-magenta));
         }
-        .back-link {
-            position: absolute;
-            top: 20px; left: 24px;
-            color: var(--text-gray);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.3s;
-        }
-        .back-link:hover { color: var(--primary-blue); }
         .portal-logo { margin-bottom: 10px; }
         .portal-logo img { height: 60px; width: auto; }
         .portal-title { font-size: 26px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
@@ -174,6 +161,40 @@
         .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
         .divider span { padding: 0 16px; }
 
+
+        /* ===== BOTÓN VOLVER MEJORADO ===== */
+        .btn-volver {
+            position: absolute;
+            top: 20px;
+            left: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            text-decoration: none;
+        }
+        .btn-volver:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-magenta));
+        }
+        .btn-volver i {
+            font-size: 14px;
+        }
+        .btn-volver span {
+            letter-spacing: 0.5px;
+        }
+
         @media (max-width: 480px) {
             .portal-container { padding: 40px 24px; border-radius: 24px; }
             .portal-title { font-size: 22px; }
@@ -185,7 +206,10 @@
 </head>
 <body>
     <div class="portal-container">
-        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver</a>
+        <button onclick="window.location.href='index.html'" class="btn-volver">
+    <i class="fas fa-home"></i>
+    <span>Inicio</span>
+</button>
         <div class="portal-logo"><img src="logo_bioclinlab.png" alt="BIOCLINLAB"></div>
         <h1 class="portal-title">Portal de Clientes</h1>
         <p class="portal-subtitle">Accede a tus resultados de forma segura</p>
