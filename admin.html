@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIOCLINLAB - Panel de Administración</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0EA5E9;
+            --primary-magenta: #C0266B;
+            --dark-blue: #0C4A6E;
+            --light-blue: #E0F2FE;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8FAFC;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --text-light: #94A3B8;
+            --border: #E2E8F0;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 260px;
+            background: linear-gradient(180deg, var(--dark-blue), #083344);
+            color: white;
+            padding: 24px 0;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-logo {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo img {
+            height: 45px;
+            filter: brightness(0) invert(1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0 12px;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .sidebar-menu a.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+        }
+
+        .sidebar-menu i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0; right: 0;
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+        }
+
+        .sidebar-footer a:hover { color: white; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-wrapper {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .topbar {
+            background: var(--bg-white);
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .topbar-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .topbar-role {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        /* ===== CONTENT AREA ===== */
+        .content {
+            padding: 30px;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.blue { background: var(--light-blue); color: var(--primary-blue); }
+        .stat-icon.green { background: #dcfce7; color: var(--success); }
+        .stat-icon.orange { background: #fef3c7; color: var(--warning); }
+        .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+
+        .stat-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .stat-info p {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-top: 4px;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-gray);
+            border: 2px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* ===== SEARCH BAR ===== */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-light);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            min-width: 280px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--text-dark);
+            outline: none;
+            width: 100%;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-light);
+        }
+
+        .search-bar i {
+            color: var(--text-light);
+        }
+
+        /* ===== FORM ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* ===== FILE UPLOAD ===== */
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-light);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+
+        .file-upload-area i {
+            font-size: 36px;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .file-upload-area p {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 6px;
+        }
+
+        .file-upload-area small {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .file-upload-area input[type="file"] {
+            display: none;
+        }
+
+        .file-selected {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #dcfce7;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #166534;
+        }
+
+        .file-selected i {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* ===== TABLE ===== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: var(--bg-light);
+        }
+
+        .data-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--bg-light); }
+        .data-table tr.fila-listo { background: rgba(34, 197, 94, 0.05); }
+        .data-table tr.fila-proceso { background: rgba(245, 158, 11, 0.05); }
+
+        .estado-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .estado-listo { background: #dcfce7; color: #166534; }
+        .estado-proceso { background: #fef3c7; color: #92400e; }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .action-btn.edit {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .action-btn.delete {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .action-btn.pdf {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .action-btn.upload-pdf {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+
+        .action-btn:hover { transform: scale(1.1); }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 32px;
+            width: 90%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .modal-close {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: var(--bg-light);
+            color: var(--text-gray);
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: var(--bg-light);
+            padding: 4px;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-gray);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--bg-white);
+            color: var(--text-dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-hidden { display: none; }
+
+        /* ===== SPINNER ===== */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== MOBILE MENU TOGGLE ===== */
+        .menu-toggle {
+            display: none;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            font-size: 18px;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .sidebar { width: 220px; }
+            .main-wrapper { margin-left: 220px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-wrapper { margin-left: 0; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .topbar { padding: 12px 16px; }
+            .content { padding: 16px; }
+            .menu-toggle { display: flex; align-items: center; justify-content: center; }
+            .search-bar { min-width: 100%; width: 100%; }
+            .section-header { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <img src="logo_bioclinlab.png" alt="BIOCLINLAB">
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active" onclick="showTab('dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="#" onclick="showTab('pacientes', this)"><i class="fas fa-users"></i> Pacientes</a></li>
+            <li><a href="#" onclick="showTab('resultados', this)"><i class="fas fa-vial"></i> Resultados</a></li>
+            <li><a href="#" onclick="showTab('empresas', this)"><i class="fas fa-building"></i> Empresas</a></li>
+            <li><a href="#" onclick="showTab('config', this)"><i class="fas fa-cog"></i> Configuración</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="index.html"><i class="fas fa-arrow-left"></i> Volver al sitio</a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN WRAPPER ===== -->
+    <div class="main-wrapper">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div style="display:flex;align-items:center;">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <h1 class="topbar-title" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="topbar-user">
+                <div>
+                    <div class="topbar-name">Administrador</div>
+                    <div class="topbar-role">BIOCLINLAB</div>
+                </div>
+                <div class="topbar-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main class="content">
+
+            <!-- Alertas -->
+            <div id="alertSuccess" class="alert alert-success alert-hidden">
+                <i class="fas fa-check-circle"></i>
+                <span id="alertSuccessText">Operación exitosa</span>
+            </div>
+            <div id="alertError" class="alert alert-error alert-hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="alertErrorText">Error en la operación</span>
+            </div>
+
+            <!-- ===== DASHBOARD TAB ===== -->
+            <div id="dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statPacientes">0</h3>
+                            <p>Pacientes registrados</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statListos">0</h3>
+                            <p>Resultados listos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statProceso">0</h3>
+                            <p>En proceso</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-building"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statEmpresas">0</h3>
+                            <p>Empresas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Últimos resultados registrados</h2>
+                        <button class="btn btn-primary" onclick="showTab('resultados', document.querySelectorAll('.sidebar-menu a')[2])">
+                            <i class="fas fa-plus"></i> Nuevo resultado
+                        </button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>N° Orden</th>
+                                <th>Paciente</th>
+                                <th>Fecha</th>
+                                <th>Exámenes</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboardResultados">
+                            <tr><td colspan="5" style="text-align:center;color:var(--text-gray);">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== PACIENTES TAB ===== -->
+            <div id="pacientes" class="tab-content">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Registrar nuevo paciente</h2>
+                    </div>
+                    <form id="formPaciente" onsubmit="registrarPaciente(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="pacCedula">Cédula</label>
+                                <input type="text" id="pacCedula" placeholder="Ej: 1234567890" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pacNombre">Nombre completo</label>
+                                <input type="text" id="pacNombre" placeholder="Ej: Juan Pérez" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pacEmail">Email (opcional)</label>
+                                <input type="email" id="pacEmail" placeholder="Ej: juan@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="pacTelefono">Teléfono (opcional)</label>
+                                <input type="text" id="pacTelefono" placeholder="Ej: 0991234567">
+                            </div>
+                        </div>
+                        <div style="margin-top:16px;">
+                            <button type="submit" class="btn btn-primary" id="btnGuardarPaciente">
+                                <i class="fas fa-save"></i> Guardar paciente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Lista de pacientes</h2>
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="buscarPaciente" placeholder="Buscar por cédula o nombre..." oninput="filtrarPacientes()">
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Cédula</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPacientes">
+                            <tr><td colspan="6" style="text-align:center;color:var(--text-gray);">Cargando pacientes...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== RESULTADOS TAB ===== -->
+            <div id="resultados" class="tab-content">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Subir nuevo resultado</h2>
+                    </div>
+                    <form id="formResultado" onsubmit="registrarResultado(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="resPaciente">Paciente (Cédula)</label>
+                                <input type="text" id="resPaciente" placeholder="Ej: 1234567890" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="resOrden">N° Orden</label>
+                                <input type="text" id="resOrden" placeholder="Ej: 260615001" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="resFecha">Fecha del examen</label>
+                                <input type="date" id="resFecha" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="resEstado">Estado</label>
+                                <select id="resEstado" required>
+                                    <option value="proceso">En proceso</option>
+                                    <option value="listo">Listo</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="resExamenes">Exámenes realizados</label>
+                                <textarea id="resExamenes" placeholder="Ej: Hemograma Completo, Glucosa, Creatinina" required></textarea>
+                            </div>
+                        </div>
+                        <div style="margin-top:16px;">
+                            <button type="submit" class="btn btn-primary" id="btnGuardarResultado">
+                                <i class="fas fa-save"></i> Guardar resultado
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Todos los resultados</h2>
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="buscarResultado" placeholder="Buscar por orden, paciente o examen..." oninput="filtrarResultados()">
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>N° Orden</th>
+                                <th>Paciente</th>
+                                <th>Fecha</th>
+                                <th>Exámenes</th>
+                                <th>Estado</th>
+                                <th>PDF</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResultados">
+                            <tr><td colspan="7" style="text-align:center;color:var(--text-gray);">Cargando resultados...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== EMPRESAS TAB ===== -->
+            <div id="empresas" class="tab-content">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Gestión de empresas</h2>
+                        <button class="btn btn-primary" onclick="alert('Función en desarrollo')">
+                            <i class="fas fa-plus"></i> Nueva empresa
+                        </button>
+                    </div>
+                    <p style="color:var(--text-gray);text-align:center;padding:40px;">
+                        <i class="fas fa-building" style="font-size:48px;display:block;margin-bottom:16px;opacity:0.3;"></i>
+                        Módulo de empresas en desarrollo.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===== CONFIG TAB ===== -->
+            <div id="config" class="tab-content">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Configuración del sistema</h2>
+                    </div>
+                    <p style="color:var(--text-gray);text-align:center;padding:40px;">
+                        <i class="fas fa-cog" style="font-size:48px;display:block;margin-bottom:16px;opacity:0.3;"></i>
+                        Configuración avanzada en desarrollo.
+                    </p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ===== MODAL EDITAR PACIENTE ===== -->
+    <div class="modal-overlay" id="modalEditarPaciente">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user-edit" style="color:var(--primary-blue);margin-right:8px;"></i>Editar Paciente</h3>
+                <button class="modal-close" onclick="cerrarModal('modalEditarPaciente')"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formEditarPaciente" onsubmit="guardarEdicionPaciente(event)">
+                <input type="hidden" id="editPacId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editPacCedula">Cédula</label>
+                        <input type="text" id="editPacCedula" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPacNombre">Nombre completo</label>
+                        <input type="text" id="editPacNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPacEmail">Email</label>
+                        <input type="email" id="editPacEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPacTelefono">Teléfono</label>
+                        <input type="text" id="editPacTelefono">
+                    </div>
+                </div>
+                <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="cerrarModal('modalEditarPaciente')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardarEdicion">
+                        <i class="fas fa-save"></i> Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL SUBIR PDF ===== -->
+    <div class="modal-overlay" id="modalSubirPDF">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-file-pdf" style="color:var(--danger);margin-right:8px;"></i>Subir PDF de Resultado</h3>
+                <button class="modal-close" onclick="cerrarModal('modalSubirPDF')"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formSubirPDF" onsubmit="subirPDF(event)">
+                <input type="hidden" id="pdfResultadoId">
+                <input type="hidden" id="pdfNumeroOrden">
+                <div class="form-group full-width">
+                    <label>N° Orden</label>
+                    <input type="text" id="pdfOrdenDisplay" readonly style="background:var(--bg-light);color:var(--text-gray);">
+                </div>
+                <div class="form-group full-width">
+                    <label>Seleccionar archivo PDF</label>
+                    <div class="file-upload-area" id="dropZone" onclick="document.getElementById('inputPDF').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Arrastra el PDF aquí o haz clic para seleccionar</p>
+                        <small>Formato: PDF | Máximo: 10MB</small>
+                        <input type="file" id="inputPDF" accept=".pdf,application/pdf" onchange="mostrarArchivoSeleccionado(this)">
+                    </div>
+                    <div id="archivoSeleccionado" style="display:none;">
+                        <div class="file-selected">
+                            <i class="fas fa-file-pdf"></i>
+                            <span id="nombreArchivo"></span>
+                            <button type="button" style="margin-left:auto;background:none;border:none;color:var(--danger);cursor:pointer;" onclick="limpiarArchivo()"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="cerrarModal('modalSubirPDF')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubirPDF">
+                        <i class="fas fa-upload"></i> Subir PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+
+    <script>
+        // ===== CONFIGURACIÓN SUPABASE =====
+        const SUPABASE_URL = 'https://nbegepuaddvifdfeaaal.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZWdlcHVhZGR2aWZkZmVhYWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTEwNzUsImV4cCI6MjA5NzgyNzA3NX0.szcXAZ9D9SA3DkrHEpaZgLZKIHzdbZli02bChgAUxIQ';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const BUCKET_NAME = 'resultados-pdf';
+
+        // Variables globales para filtrado
+        let todosPacientes = [];
+        let todosResultados = [];
+
+        // ===== NAVEGACIÓN =====
+        function showTab(tabId, linkEl) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            if (linkEl) linkEl.classList.add('active');
+
+            const titles = {
+                dashboard: 'Dashboard',
+                pacientes: 'Gestión de Pacientes',
+                resultados: 'Gestión de Resultados',
+                empresas: 'Empresas',
+                config: 'Configuración'
+            };
+            document.getElementById('pageTitle').textContent = titles[tabId];
+
+            // Cerrar sidebar en móvil
+            document.getElementById('sidebar').classList.remove('open');
+
+            if (tabId === 'dashboard') cargarDashboard();
+            if (tabId === 'pacientes') cargarPacientes();
+            if (tabId === 'resultados') cargarResultadosAdmin();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ===== MODALES =====
+        function abrirModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) cerrarModal(this.id);
+            });
+        });
+
+        // ===== ALERTAS =====
+        function showAlert(type, message) {
+            const alertEl = document.getElementById(type === 'success' ? 'alertSuccess' : 'alertError');
+            const textEl = document.getElementById(type === 'success' ? 'alertSuccessText' : 'alertErrorText');
+            textEl.textContent = message;
+            alertEl.classList.remove('alert-hidden');
+            setTimeout(() => alertEl.classList.add('alert-hidden'), 4000);
+        }
+
+        // ===== SPINNER EN BOTÓN =====
+        function setLoading(btnId, loading) {
+            const btn = document.getElementById(btnId);
+            if (loading) {
+                btn.dataset.originalHTML = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner"></span> Procesando...';
+                btn.disabled = true;
+            } else {
+                btn.innerHTML = btn.dataset.originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        // ===== CARGAR DASHBOARD =====
+        async function cargarDashboard() {
+            try {
+                // Contar pacientes
+                const { count: pacientesCount, error: errPac } = await supabaseClient
+                    .from('pacientes')
+                    .select('*', { count: 'exact', head: true });
+
+                // Contar resultados listos
+                const { count: listosCount, error: errListos } = await supabaseClient
+                    .from('resultados')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('estado', 'listo');
+
+                // Contar resultados en proceso
+                const { count: procesoCount, error: errProceso } = await supabaseClient
+                    .from('resultados')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('estado', 'proceso');
+
+                document.getElementById('statPacientes').textContent = pacientesCount || 0;
+                document.getElementById('statListos').textContent = listosCount || 0;
+                document.getElementById('statProceso').textContent = procesoCount || 0;
+                document.getElementById('statEmpresas').textContent = '0';
+
+                // Cargar últimos resultados
+                const { data: resultados, error: errRes } = await supabaseClient
+                    .from('resultados')
+                    .select('*, pacientes(nombre)')
+                    .order('fecha_examen', { ascending: false })
+                    .order('numero_orden', { ascending: false })
+                    .limit(5);
+
+                const tbody = document.getElementById('dashboardResultados');
+                if (errRes || !resultados || resultados.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-gray);">No hay resultados registrados</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = resultados.map(r => `
+                    <tr>
+                        <td><strong style="color:var(--primary-blue);">${r.numero_orden}</strong></td>
+                        <td>${r.pacientes?.nombre || 'N/A'}</td>
+                        <td>${new Date(r.fecha_examen).toLocaleDateString('es-ES')}</td>
+                        <td>${r.examenes}</td>
+                        <td><span class="estado-badge estado-${r.estado}">${r.estado === 'listo' ? 'LISTO' : 'EN PROCESO'}</span></td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                console.error('Error cargando dashboard:', err);
+            }
+        }
+
+        // ===== REGISTRAR PACIENTE =====
+        async function registrarPaciente(e) {
+            e.preventDefault();
+            const cedula = document.getElementById('pacCedula').value.trim();
+            const nombre = document.getElementById('pacNombre').value.trim();
+            const email = document.getElementById('pacEmail').value.trim();
+            const telefono = document.getElementById('pacTelefono').value.trim();
+
+            setLoading('btnGuardarPaciente', true);
+
+            try {
+                // Verificar si la cédula ya existe
+                const { data: existente } = await supabaseClient
+                    .from('pacientes')
+                    .select('id')
+                    .eq('cedula', cedula)
+                    .single();
+
+                if (existente) {
+                    showAlert('error', 'Ya existe un paciente con esa cédula');
+                    setLoading('btnGuardarPaciente', false);
+                    return;
+                }
+
+                const { data, error } = await supabaseClient
+                    .from('pacientes')
+                    .insert([{ cedula, nombre, email, telefono }]);
+
+                if (error) {
+                    showAlert('error', 'Error: ' + error.message);
+                    setLoading('btnGuardarPaciente', false);
+                    return;
+                }
+
+                showAlert('success', 'Paciente registrado correctamente');
+                document.getElementById('formPaciente').reset();
+                cargarPacientes();
+                cargarDashboard();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+                console.error(err);
+            } finally {
+                setLoading('btnGuardarPaciente', false);
+            }
+        }
+
+        // ===== CARGAR PACIENTES =====
+        async function cargarPacientes() {
+            try {
+                const { data: pacientes, error } = await supabaseClient
+                    .from('pacientes')
+                    .select('*')
+                    .order('fecha_registro', { ascending: false });
+
+                todosPacientes = pacientes || [];
+                renderPacientes(todosPacientes);
+
+            } catch (err) {
+                console.error('Error cargando pacientes:', err);
+            }
+        }
+
+        // ===== RENDER PACIENTES =====
+        function renderPacientes(pacientes) {
+            const tbody = document.getElementById('tablaPacientes');
+            if (!pacientes || pacientes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-gray);">No hay pacientes registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pacientes.map(p => `
+                <tr>
+                    <td><strong>${p.cedula}</strong></td>
+                    <td>${p.nombre}</td>
+                    <td>${p.email || '-'}</td>
+                    <td>${p.telefono || '-'}</td>
+                    <td>${new Date(p.fecha_registro).toLocaleDateString('es-ES')}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn edit" title="Editar" onclick="abrirEditarPaciente('${p.id}', '${p.cedula}', '${p.nombre}', '${p.email || ''}', '${p.telefono || ''}')"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Eliminar" onclick="eliminarPaciente('${p.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ===== FILTRAR PACIENTES =====
+        function filtrarPacientes() {
+            const texto = document.getElementById('buscarPaciente').value.toLowerCase().trim();
+            if (!texto) {
+                renderPacientes(todosPacientes);
+                return;
+            }
+            const filtrados = todosPacientes.filter(p =>
+                p.cedula.toLowerCase().includes(texto) ||
+                p.nombre.toLowerCase().includes(texto)
+            );
+            renderPacientes(filtrados);
+        }
+
+        // ===== ABRIR MODAL EDITAR PACIENTE =====
+        function abrirEditarPaciente(id, cedula, nombre, email, telefono) {
+            document.getElementById('editPacId').value = id;
+            document.getElementById('editPacCedula').value = cedula;
+            document.getElementById('editPacNombre').value = nombre;
+            document.getElementById('editPacEmail').value = email;
+            document.getElementById('editPacTelefono').value = telefono;
+            abrirModal('modalEditarPaciente');
+        }
+
+        // ===== GUARDAR EDICIÓN PACIENTE =====
+        async function guardarEdicionPaciente(e) {
+            e.preventDefault();
+            const id = document.getElementById('editPacId').value;
+            const cedula = document.getElementById('editPacCedula').value.trim();
+            const nombre = document.getElementById('editPacNombre').value.trim();
+            const email = document.getElementById('editPacEmail').value.trim();
+            const telefono = document.getElementById('editPacTelefono').value.trim();
+
+            setLoading('btnGuardarEdicion', true);
+
+            try {
+                const { error } = await supabaseClient
+                    .from('pacientes')
+                    .update({ cedula, nombre, email, telefono })
+                    .eq('id', id);
+
+                if (error) {
+                    showAlert('error', 'Error al actualizar: ' + error.message);
+                    setLoading('btnGuardarEdicion', false);
+                    return;
+                }
+
+                showAlert('success', 'Paciente actualizado correctamente');
+                cerrarModal('modalEditarPaciente');
+                cargarPacientes();
+                cargarDashboard();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+                console.error(err);
+            } finally {
+                setLoading('btnGuardarEdicion', false);
+            }
+        }
+
+        // ===== ELIMINAR PACIENTE =====
+        async function eliminarPaciente(id) {
+            if (!confirm('¿Estás seguro de eliminar este paciente? Se eliminarán también sus resultados.')) return;
+
+            try {
+                // Primero eliminar resultados asociados
+                await supabaseClient.from('resultados').delete().eq('paciente_id', id);
+
+                const { error } = await supabaseClient
+                    .from('pacientes')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    showAlert('error', 'Error al eliminar');
+                    return;
+                }
+
+                showAlert('success', 'Paciente eliminado');
+                cargarPacientes();
+                cargarDashboard();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+            }
+        }
+
+        // ===== REGISTRAR RESULTADO =====
+        async function registrarResultado(e) {
+            e.preventDefault();
+            const cedula = document.getElementById('resPaciente').value.trim();
+            const numero_orden = document.getElementById('resOrden').value.trim();
+            const fecha_examen = document.getElementById('resFecha').value;
+            const estado = document.getElementById('resEstado').value;
+            const examenes = document.getElementById('resExamenes').value.trim();
+
+            setLoading('btnGuardarResultado', true);
+
+            try {
+                // Verificar si el número de orden ya existe
+                const { data: ordenExistente } = await supabaseClient
+                    .from('resultados')
+                    .select('id')
+                    .eq('numero_orden', numero_orden)
+                    .single();
+
+                if (ordenExistente) {
+                    showAlert('error', 'Ya existe un resultado con ese N° Orden');
+                    setLoading('btnGuardarResultado', false);
+                    return;
+                }
+
+                // Buscar paciente por cédula
+                const { data: paciente, error: errPac } = await supabaseClient
+                    .from('pacientes')
+                    .select('id')
+                    .eq('cedula', cedula)
+                    .single();
+
+                if (errPac || !paciente) {
+                    showAlert('error', 'Paciente no encontrado. Regístralo primero.');
+                    setLoading('btnGuardarResultado', false);
+                    return;
+                }
+
+                const { data, error } = await supabaseClient
+                    .from('resultados')
+                    .insert([{
+                        paciente_id: paciente.id,
+                        numero_orden,
+                        fecha_examen,
+                        examenes,
+                        estado
+                    }]);
+
+                if (error) {
+                    showAlert('error', 'Error: ' + error.message);
+                    setLoading('btnGuardarResultado', false);
+                    return;
+                }
+
+                showAlert('success', 'Resultado registrado correctamente');
+                document.getElementById('formResultado').reset();
+                cargarResultadosAdmin();
+                cargarDashboard();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+                console.error(err);
+            } finally {
+                setLoading('btnGuardarResultado', false);
+            }
+        }
+
+        // ===== CARGAR RESULTADOS (ADMIN) =====
+        async function cargarResultadosAdmin() {
+            try {
+                const { data: resultados, error } = await supabaseClient
+                    .from('resultados')
+                    .select('*, pacientes(nombre, cedula)')
+                    .order('fecha_examen', { ascending: false })
+                    .order('numero_orden', { ascending: false });
+
+                todosResultados = resultados || [];
+                renderResultados(todosResultados);
+
+            } catch (err) {
+                console.error('Error cargando resultados:', err);
+            }
+        }
+
+        // ===== RENDER RESULTADOS =====
+        function renderResultados(resultados) {
+            const tbody = document.getElementById('tablaResultados');
+            if (!resultados || resultados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-gray);">No hay resultados registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = resultados.map(r => {
+                const tienePDF = r.pdf_url && r.pdf_url.length > 0;
+                return `
+                <tr class="fila-${r.estado}">
+                    <td><strong style="color:var(--primary-blue);">${r.numero_orden}</strong></td>
+                    <td>${r.pacientes?.nombre || 'N/A'}<br><small style="color:var(--text-gray);">${r.pacientes?.cedula || ''}</small></td>
+                    <td>${new Date(r.fecha_examen).toLocaleDateString('es-ES')}</td>
+                    <td>${r.examenes}</td>
+                    <td><span class="estado-badge estado-${r.estado}">${r.estado === 'listo' ? 'LISTO' : 'EN PROCESO'}</span></td>
+                    <td>
+                        ${tienePDF
+                            ? `<button class="action-btn pdf" title="Previsualizar PDF" onclick="verPDF('${r.id}', '${r.pdf_url}')"><i class="fas fa-file-pdf"></i></button>`
+                            : `<span style="color:var(--text-light);font-size:12px;">Sin PDF</span>`
+                        }
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn upload-pdf" title="Subir PDF" onclick="abrirModalPDF('${r.id}', '${r.numero_orden}')"><i class="fas fa-cloud-upload-alt"></i></button>
+                            ${r.estado === 'proceso'
+                                ? (tienePDF
+                                    ? `<button class="action-btn edit" title="Validar resultado" onclick="validarResultado('${r.id}', true)" style="background: #dcfce7; color: #166534;"><i class="fas fa-check"></i></button>`
+                                    : `<button class="action-btn edit" title="Sube un PDF primero para validar" disabled style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed; opacity: 0.6;"><i class="fas fa-check"></i></button>`
+                                  )
+                                : `<button class="action-btn edit" title="Desvalidar resultado" onclick="validarResultado('${r.id}', false)" style="background: #fef3c7; color: #92400e;"><i class="fas fa-undo"></i></button>`
+                            }
+                            <button class="action-btn delete" title="Eliminar" onclick="eliminarResultado('${r.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        // ===== FILTRAR RESULTADOS =====
+        function filtrarResultados() {
+            const texto = document.getElementById('buscarResultado').value.toLowerCase().trim();
+            if (!texto) {
+                renderResultados(todosResultados);
+                return;
+            }
+            const filtrados = todosResultados.filter(r =>
+                r.numero_orden.toLowerCase().includes(texto) ||
+                (r.pacientes?.nombre || '').toLowerCase().includes(texto) ||
+                (r.pacientes?.cedula || '').toLowerCase().includes(texto) ||
+                r.examenes.toLowerCase().includes(texto)
+            );
+            renderResultados(filtrados);
+        }
+
+        // ===== ABRIR MODAL PDF =====
+        function abrirModalPDF(resultadoId, numeroOrden) {
+            document.getElementById('pdfResultadoId').value = resultadoId;
+            document.getElementById('pdfNumeroOrden').value = numeroOrden;
+            document.getElementById('pdfOrdenDisplay').value = numeroOrden;
+            limpiarArchivo();
+            abrirModal('modalSubirPDF');
+        }
+
+        // ===== MOSTRAR ARCHIVO SELECCIONADO =====
+        function mostrarArchivoSeleccionado(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('nombreArchivo').textContent = file.name;
+                document.getElementById('archivoSeleccionado').style.display = 'block';
+            }
+        }
+
+        function limpiarArchivo() {
+            document.getElementById('inputPDF').value = '';
+            document.getElementById('archivoSeleccionado').style.display = 'none';
+            document.getElementById('nombreArchivo').textContent = '';
+        }
+
+        // ===== DRAG & DROP =====
+        const dropZone = document.getElementById('dropZone');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    document.getElementById('inputPDF').files = files;
+                    mostrarArchivoSeleccionado(document.getElementById('inputPDF'));
+                }
+            });
+        }
+
+                // Variables para el modal de PDF
+        let pdfActualId = '';
+        let pdfActualUrl = '';
+
+        // ===== VER PDF (PREVISUALIZAR) =====
+        function verPDF(resultadoId, pdfUrl) {
+            pdfActualId = resultadoId;
+            pdfActualUrl = pdfUrl;
+            document.getElementById('pdfPreviewFrame').src = pdfUrl;
+            abrirModal('modalVerPDF');
+        }
+
+        // ===== ELIMINAR PDF DESDE MODAL =====
+        async function eliminarPDFDesdeModal() {
+            if (!pdfActualId || !pdfActualUrl) return;
+
+            if (!confirm('¿Estás seguro de eliminar este PDF? El resultado seguirá existiendo pero sin archivo.')) return;
+
+            try {
+                // Extraer el nombre del archivo de la URL pública
+                // La URL tiene formato: .../object/public/resultados-pdf/nombre_archivo.pdf
+                const urlParts = pdfActualUrl.split('/');
+                const filePath = urlParts[urlParts.length - 1];
+
+                console.log('Intentando eliminar archivo:', filePath);
+                console.log('Bucket:', BUCKET_NAME);
+
+                // Eliminar del storage
+                const { data: removeData, error: removeError } = await supabaseClient
+                    .storage
+                    .from(BUCKET_NAME)
+                    .remove([filePath]);
+
+                if (removeError) {
+                    console.error('Error al eliminar del storage:', removeError);
+                    showAlert('error', 'Error al eliminar del storage: ' + removeError.message);
+                    // Continuamos para intentar limpiar la URL de la tabla igual
+                } else {
+                    console.log('Archivo eliminado del storage:', removeData);
+                }
+
+                // Actualizar la tabla: quitar pdf_url
+                const { error: updateError } = await supabaseClient
+                    .from('resultados')
+                    .update({ pdf_url: null })
+                    .eq('id', pdfActualId);
+
+                if (updateError) {
+                    showAlert('error', 'Error al actualizar tabla: ' + updateError.message);
+                    return;
+                }
+
+                showAlert('success', 'PDF eliminado correctamente');
+                cerrarModal('modalVerPDF');
+                cargarResultadosAdmin();
+                cargarDashboard();
+
+            } catch (err) {
+                showAlert('error', 'Error al eliminar el PDF');
+                console.error('Error completo:', err);
+            }
+        }
+
+// ===== SUBIR PDF =====
+        async function subirPDF(e) {
+            e.preventDefault();
+            const resultadoId = document.getElementById('pdfResultadoId').value;
+            const numeroOrden = document.getElementById('pdfNumeroOrden').value;
+            const fileInput = document.getElementById('inputPDF');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showAlert('error', 'Selecciona un archivo PDF');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showAlert('error', 'El archivo no puede superar los 10MB');
+                return;
+            }
+
+            setLoading('btnSubirPDF', true);
+
+            try {
+                // Nombre del archivo: orden_fecha_hora_min_seg.pdf (único)
+                const ahora = new Date();
+                const fecha = ahora.toISOString().split('T')[0];
+                const hora = String(ahora.getHours()).padStart(2, '0');
+                const minutos = String(ahora.getMinutes()).padStart(2, '0');
+                const segundos = String(ahora.getSeconds()).padStart(2, '0');
+                const filePath = `${numeroOrden}_${fecha}_${hora}-${minutos}-${segundos}.pdf`;
+
+                // Subir a Storage
+                const { data: uploadData, error: uploadError } = await supabaseClient
+                    .storage
+                    .from(BUCKET_NAME)
+                    .upload(filePath, file, {
+                        contentType: 'application/pdf',
+                        upsert: true
+                    });
+
+                if (uploadError) {
+                    showAlert('error', 'Error al subir PDF: ' + uploadError.message);
+                    setLoading('btnSubirPDF', false);
+                    return;
+                }
+
+                // Obtener URL pública
+                const { data: urlData } = supabaseClient
+                    .storage
+                    .from(BUCKET_NAME)
+                    .getPublicUrl(filePath);
+
+                const publicUrl = urlData.publicUrl;
+
+                // Guardar URL en la tabla resultados
+                const { error: updateError } = await supabaseClient
+                    .from('resultados')
+                    .update({ pdf_url: publicUrl })
+                    .eq('id', resultadoId);
+
+                if (updateError) {
+                    showAlert('error', 'Error al guardar URL: ' + updateError.message);
+                    setLoading('btnSubirPDF', false);
+                    return;
+                }
+
+                showAlert('success', 'PDF subido correctamente');
+                cerrarModal('modalSubirPDF');
+                cargarResultadosAdmin();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión al subir PDF');
+                console.error(err);
+            } finally {
+                setLoading('btnSubirPDF', false);
+            }
+        }
+
+                // ===== VALIDAR / DESVALIDAR RESULTADO =====
+        async function validarResultado(id, validar) {
+            const mensaje = validar 
+                ? '¿Deseas validar este resultado?' 
+                : '¿Deseas desvalidar este resultado?';
+
+            if (!confirm(mensaje)) return;
+
+            try {
+                const nuevoEstado = validar ? 'listo' : 'proceso';
+
+                const { error } = await supabaseClient
+                    .from('resultados')
+                    .update({ estado: nuevoEstado })
+                    .eq('id', id);
+
+                if (error) {
+                    showAlert('error', 'Error al cambiar estado: ' + error.message);
+                    return;
+                }
+
+                showAlert('success', validar ? 'Resultado validado correctamente' : 'Resultado desvalidado correctamente');
+                cargarResultadosAdmin();
+                cargarDashboard();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+                console.error(err);
+            }
+        }
+
+// ===== ELIMINAR RESULTADO =====
+        async function eliminarResultado(id) {
+            if (!confirm('¿Estás seguro de eliminar este resultado?')) return;
+
+            try {
+                console.log('Eliminando resultado con ID:', id);
+
+                // Intentar obtener el resultado para saber si tiene PDF
+                let pdfUrl = null;
+                try {
+                    const { data: resultado, error: errSelect } = await supabaseClient
+                        .from('resultados')
+                        .select('pdf_url')
+                        .eq('id', id)
+                        .single();
+
+                    if (errSelect) {
+                        console.log('No se pudo obtener resultado (puede ser RLS):', errSelect.message);
+                    } else if (resultado && resultado.pdf_url) {
+                        pdfUrl = resultado.pdf_url;
+                        console.log('PDF encontrado:', pdfUrl);
+                    }
+                } catch (e) {
+                    console.log('Error al obtener PDF info:', e);
+                }
+
+                // Si tiene PDF, intentar eliminarlo del storage
+                if (pdfUrl) {
+                    try {
+                        const urlParts = pdfUrl.split('/');
+                        const filePath = urlParts[urlParts.length - 1];
+                        console.log('Eliminando archivo del storage:', filePath);
+                        await supabaseClient.storage.from(BUCKET_NAME).remove([filePath]);
+                        console.log('Archivo eliminado del storage');
+                    } catch (storageErr) {
+                        console.log('Error al eliminar del storage (continuando):', storageErr);
+                    }
+                }
+
+                // Eliminar el resultado de la tabla
+                console.log('Eliminando resultado de la tabla...');
+                const { error } = await supabaseClient
+                    .from('resultados')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    console.error('Error al eliminar resultado:', error);
+                    showAlert('error', 'Error al eliminar: ' + error.message);
+                    return;
+                }
+
+                console.log('Resultado eliminado correctamente');
+                showAlert('success', 'Resultado eliminado correctamente');
+                cargarResultadosAdmin();
+                cargarDashboard();
+
+            } catch (err) {
+                console.error('Error general:', err);
+                showAlert('error', 'Error de conexión: ' + (err.message || 'desconocido'));
+            }
+        }
+
+        // ===== INICIAR =====
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarDashboard();
+        });
+    </script>
+
+    <!-- ===== MODAL PREVISUALIZAR PDF ===== -->
+    <div class="modal-overlay" id="modalVerPDF">
+        <div class="modal" style="max-width: 900px; width: 95%;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-file-pdf" style="color:var(--danger);margin-right:8px;"></i>Previsualizar PDF</h3>
+                <button class="modal-close" onclick="cerrarModal('modalVerPDF')"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="width:100%; height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+                <iframe id="pdfPreviewFrame" src="" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
+            <div style="margin-top:16px; display:flex; gap:10px; justify-content:flex-end; align-items:center;">
+                <button type="button" class="btn btn-outline" onclick="cerrarModal('modalVerPDF')">Cerrar</button>
+                <button type="button" class="btn btn-danger" id="btnEliminarPDF" onclick="eliminarPDFDesdeModal()" style="background: var(--danger); color: white;">
+                    <i class="fas fa-times"></i> Eliminar PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

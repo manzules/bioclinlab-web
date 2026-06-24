@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIOCLINLAB - Portal de Clientes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0EA5E9;
+            --primary-magenta: #C0266B;
+            --dark-blue: #0C4A6E;
+            --light-blue: #E0F2FE;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8FAFC;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --success: #22C55E;
+            --danger: #EF4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0C4A6E 0%, #0EA5E9 50%, #C0266B 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .portal-container {
+            background: var(--bg-white);
+            border-radius: 32px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 480px;
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .portal-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-magenta));
+        }
+        .back-link {
+            position: absolute;
+            top: 20px; left: 24px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s;
+        }
+        .back-link:hover { color: var(--primary-blue); }
+        .portal-logo { margin-bottom: 10px; }
+        .portal-logo img { height: 60px; width: auto; }
+        .portal-title { font-size: 26px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+        .portal-subtitle { font-size: 14px; color: var(--text-gray); margin-bottom: 35px; }
+        .user-type-label { font-size: 13px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 18px; }
+        .user-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 30px; }
+        .user-type-btn {
+            background: var(--bg-light); border: 2px solid transparent; border-radius: 16px;
+            padding: 28px 16px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .user-type-btn:hover { border-color: var(--primary-blue); background: var(--light-blue); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15); }
+        .user-type-btn.active { border-color: var(--primary-blue); background: linear-gradient(135deg, var(--light-blue), rgba(14, 165, 233, 0.1)); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.2); }
+        .user-type-btn i { font-size: 32px; color: var(--primary-blue); }
+        .user-type-btn span { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+        .form-container { display: none; animation: fadeIn 0.4s ease; }
+        .form-container.active { display: block; }
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+        .form-group input {
+            width: 100%; padding: 14px 16px; border: 2px solid #E2E8F0; border-radius: 12px;
+            font-family: 'Poppins', sans-serif; font-size: 15px; color: var(--text-dark);
+            transition: all 0.3s ease; outline: none;
+        }
+        .form-group input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+        .form-group input::placeholder { color: #CBD5E1; }
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 48px; }
+        .toggle-pass {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-gray); cursor: pointer;
+            font-size: 16px; padding: 4px;
+        }
+        .toggle-pass:hover { color: var(--primary-blue); }
+        .btn-login {
+            width: 100%; padding: 16px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            color: white; border: none; border-radius: 12px;
+            font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; margin-top: 8px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.35); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            width: 100%; padding: 14px; background: transparent; color: var(--primary-blue);
+            border: 2px solid var(--primary-blue); border-radius: 12px;
+            font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
+        }
+        .btn-secondary:hover { background: var(--light-blue); }
+        .forgot-link { display: block; margin-top: 16px; font-size: 13px; color: var(--primary-blue); text-decoration: none; font-weight: 500; }
+        .forgot-link:hover { color: var(--primary-magenta); }
+        .portal-footer { margin-top: 30px; padding-top: 24px; border-top: 1px solid #E2E8F0; }
+        .portal-footer p { font-size: 12px; color: var(--text-gray); }
+        .portal-footer a { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
+
+        /* ===== MODAL CENTRADO ===== */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+            padding: 20px; animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white; border-radius: 24px; padding: 40px 32px;
+            max-width: 380px; width: 100%; text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            animation: scaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-icon {
+            width: 72px; height: 72px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; font-size: 28px;
+        }
+        .modal-icon.success { background: #dcfce7; color: #166534; }
+        .modal-icon.error { background: #fee2e2; color: #991b1b; }
+        .modal-icon.info { background: #dbeafe; color: #1e40af; }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+        .modal-text { font-size: 14px; color: var(--text-gray); line-height: 1.6; margin-bottom: 24px; }
+        .modal-datos { background: var(--bg-light); border-radius: 12px; padding: 14px 18px; margin-bottom: 24px; text-align: left; }
+        .modal-dato { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+        .modal-dato label { color: var(--text-gray); font-weight: 500; }
+        .modal-dato span { color: var(--text-dark); font-weight: 600; }
+        .modal-btn {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .modal-btn.primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta)); color: white;
+        }
+        .modal-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3); }
+
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.85) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .spinner {
+            width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white; border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block; vertical-align: middle; margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .divider { display: flex; align-items: center; margin: 24px 0; color: var(--text-gray); font-size: 13px; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
+        .divider span { padding: 0 16px; }
+
+        @media (max-width: 480px) {
+            .portal-container { padding: 40px 24px; border-radius: 24px; }
+            .portal-title { font-size: 22px; }
+            .user-type-btn { padding: 22px 12px; }
+            .modal-box { padding: 32px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="portal-container">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver</a>
+        <div class="portal-logo"><img src="LOGO_BIOCLINLAB.png" alt="BIOCLINLAB"></div>
+        <h1 class="portal-title">Portal de Clientes</h1>
+        <p class="portal-subtitle">Accede a tus resultados de forma segura</p>
+        <div class="user-type-label">Selecciona tu tipo de usuario</div>
+        <div class="user-type-grid">
+            <button class="user-type-btn active" onclick="selectType('paciente', this)"><i class="fas fa-user"></i><span>PACIENTE</span></button>
+            <button class="user-type-btn" onclick="selectType('empresa', this)"><i class="fas fa-building"></i><span>EMPRESA</span></button>
+        </div>
+
+        <!-- LOGIN PACIENTE -->
+        <div class="form-container active" id="login-paciente">
+            <form onsubmit="handleLoginPaciente(event)">
+                <div class="form-group"><label for="login-cedula">Cédula</label><input type="text" id="login-cedula" placeholder="Ingresa tu número de cédula" required maxlength="13"></div>
+                <div class="form-group">
+                    <label for="login-password">Contraseña</label>
+                    <div class="password-wrapper"><input type="password" id="login-password" placeholder="Ingresa tu contraseña" required><button type="button" class="toggle-pass" onclick="togglePassword('login-password', this)"><i class="fas fa-eye"></i></button></div>
+                </div>
+                <button type="submit" class="btn-login" id="btnLoginPaciente"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</button>
+            </form>
+            <div class="divider"><span>¿Primera vez?</span></div>
+            <button class="btn-secondary" onclick="mostrarRegistro()"><i class="fas fa-user-plus"></i> Registrarme como paciente</button>
+        </div>
+
+        <!-- REGISTRO PACIENTE -->
+        <div class="form-container" id="registro-paciente">
+            <h3 style="font-size:18px;font-weight:700;color:var(--text-dark);margin-bottom:20px;"><i class="fas fa-user-plus" style="color:var(--primary-blue);margin-right:8px;"></i>Registro de paciente</h3>
+            <form onsubmit="handleRegistro(event)">
+                <div class="form-group"><label for="reg-cedula">Cédula *</label><input type="text" id="reg-cedula" placeholder="Ej: 1234567890" required maxlength="13"></div>
+                <div class="form-group"><label for="reg-nombre">Nombre completo *</label><input type="text" id="reg-nombre" placeholder="Ej: Juan Pérez López" required></div>
+                <div class="form-group">
+                    <label for="reg-password">Contraseña *</label>
+                    <div class="password-wrapper"><input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required minlength="6"><button type="button" class="toggle-pass" onclick="togglePassword('reg-password', this)"><i class="fas fa-eye"></i></button></div>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password2">Confirmar contraseña *</label>
+                    <div class="password-wrapper"><input type="password" id="reg-password2" placeholder="Repite tu contraseña" required minlength="6"><button type="button" class="toggle-pass" onclick="togglePassword('reg-password2', this)"><i class="fas fa-eye"></i></button></div>
+                </div>
+                <div class="form-group"><label for="reg-telefono">Teléfono</label><input type="text" id="reg-telefono" placeholder="Ej: 0991234567"></div>
+                <div class="form-group"><label for="reg-email">Email</label><input type="email" id="reg-email" placeholder="Ej: paciente@email.com"></div>
+                <button type="submit" class="btn-login" id="btnRegistro"><i class="fas fa-save"></i> Registrarme</button>
+                <button type="button" class="btn-secondary" onclick="mostrarLogin()"><i class="fas fa-arrow-left"></i> Ya tengo cuenta</button>
+            </form>
+        </div>
+
+        <!-- LOGIN EMPRESA -->
+        <div class="form-container" id="login-empresa">
+            <form onsubmit="handleLoginEmpresa(event)">
+                <div class="form-group"><label for="user-empresa">RUC / Código de empresa</label><input type="text" id="user-empresa" placeholder="Ingresa el RUC de tu empresa" required></div>
+                <div class="form-group">
+                    <label for="pass-empresa">Contraseña</label>
+                    <div class="password-wrapper"><input type="password" id="pass-empresa" placeholder="Ingresa tu contraseña" required><button type="button" class="toggle-pass" onclick="togglePassword('pass-empresa', this)"><i class="fas fa-eye"></i></button></div>
+                </div>
+                <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</button>
+                <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+            </form>
+        </div>
+
+        <div class="portal-footer">
+            <p id="register-link" style="display:none;">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()">Regístrate aquí</a></p>
+            <p style="margin-top:8px;">© 2026 BIOCLINLAB - Todos los derechos reservados</p>
+        </div>
+    </div>
+
+    <!-- MODAL CENTRADO -->
+    <div class="modal-overlay" id="modalOverlay" onclick="cerrarModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-icon" id="modalIcon"><i class="fas fa-check"></i></div>
+            <h3 class="modal-title" id="modalTitle">Título</h3>
+            <p class="modal-text" id="modalText">Mensaje</p>
+            <div class="modal-datos" id="modalDatos" style="display:none;"></div>
+            <button class="modal-btn primary" id="modalBtn" onclick="accionModal()">Aceptar</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://nbegepuaddvifdfeaaal.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZWdlcHVhZGR2aWZkZmVhYWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTEwNzUsImV4cCI6MjA5NzgyNzA3NX0.szcXAZ9D9SA3DkrHEpaZgLZKIHzdbZli02bChgAUxIQ';
+        let supabaseClient;
+        try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error(e); }
+        let pacientesLocal = JSON.parse(localStorage.getItem('bioclinlab_pacientes_v2')) || {};
+        let modalAction = null;
+        let cedulaTemporal = '';
+
+        function mostrarModal(tipo, titulo, texto, datos, accion, textoBtn) {
+            const overlay = document.getElementById('modalOverlay');
+            const icon = document.getElementById('modalIcon');
+            icon.className = 'modal-icon ' + tipo;
+            if (tipo === 'success') icon.innerHTML = '<i class="fas fa-check"></i>';
+            else if (tipo === 'error') icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+            else if (tipo === 'info') icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+            document.getElementById('modalTitle').textContent = titulo;
+            document.getElementById('modalText').textContent = texto;
+            const datosDiv = document.getElementById('modalDatos');
+            if (datos && Object.keys(datos).length > 0) {
+                datosDiv.innerHTML = Object.entries(datos).map(([k,v]) => '<div class="modal-dato"><label>'+k+':</label><span>'+v+'</span></div>').join('');
+                datosDiv.style.display = 'block';
+            } else { datosDiv.style.display = 'none'; }
+            document.getElementById('modalBtn').textContent = textoBtn || 'Aceptar';
+            modalAction = accion;
+            overlay.classList.add('show');
+        }
+        function cerrarModalDirecto() { document.getElementById('modalOverlay').classList.remove('show'); modalAction = null; }
+        function cerrarModal(e) { if (e.target === document.getElementById('modalOverlay')) cerrarModalDirecto(); }
+        function accionModal() { 
+            const accion = modalAction; 
+            cerrarModalDirecto(); 
+            if (accion && typeof accion === 'function') accion(); 
+        }
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            const icon = btn.querySelector('i');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.className = input.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        }
+        function selectType(type, btn) {
+            document.querySelectorAll('.user-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+            if (type === 'paciente') mostrarLogin();
+            else { document.getElementById('login-empresa').classList.add('active'); document.getElementById('register-link').style.display = 'block'; }
+        }
+        function mostrarLogin() {
+            document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+            document.getElementById('login-paciente').classList.add('active');
+            document.getElementById('register-link').style.display = 'none';
+        }
+        function mostrarRegistro() {
+            document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+            document.getElementById('registro-paciente').classList.add('active');
+        }
+
+        async function handleLoginPaciente(e) {
+            e.preventDefault();
+            const cedula = document.getElementById('login-cedula').value.trim();
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('btnLoginPaciente');
+
+            if (!cedula || !password) { 
+                mostrarModal('error','Campos incompletos','Ingresa tu cédula y contraseña.',null,null,'Entendido'); 
+                return; 
+            }
+
+            btn.disabled = true; 
+            btn.innerHTML = '<span class="spinner"></span> Verificando...';
+
+            let paciente = null;
+            let authOk = false;
+            let errorMsg = '';
+
+            // 1. Intentar login con Supabase PRIMERO
+            try {
+                if (supabaseClient) {
+                    console.log('Buscando paciente en Supabase:', cedula);
+                    // Usar .select() sin .single() para evitar error 406 cuando no existe
+                    const { data, error } = await supabaseClient
+                        .from('pacientes')
+                        .select('*')
+                        .eq('cedula', cedula)
+                        .limit(1);
+
+                    if (error) {
+                        console.error('Error Supabase login:', error);
+                        errorMsg = error.message;
+                    } else if (data && data.length > 0) {
+                        console.log('Paciente encontrado en Supabase:', data[0]);
+                        if (data[0].password === password) {
+                            paciente = data[0];
+                            authOk = true;
+                        } else {
+                            errorMsg = 'Contraseña incorrecta';
+                        }
+                    } else {
+                        console.log('Paciente NO encontrado en Supabase');
+                        errorMsg = 'Paciente no encontrado en la base de datos';
+                    }
+                } else {
+                    console.warn('supabaseClient no disponible');
+                    errorMsg = 'Conexión con base de datos no disponible';
+                }
+            } catch(err) { 
+                console.error('Excepción login Supabase:', err);
+                errorMsg = err.message || 'Error de conexión con el servidor';
+            }
+
+            // 2. Si falló Supabase, intentar con localStorage (respaldo)
+            if (!authOk && pacientesLocal[cedula]) {
+                console.log('Intentando login con localStorage...');
+                if (pacientesLocal[cedula].password === password) {
+                    paciente = pacientesLocal[cedula];
+                    authOk = true;
+                    console.log('Login exitoso con localStorage');
+                } else {
+                    errorMsg = 'Contraseña incorrecta (datos locales)';
+                }
+            }
+
+            btn.disabled = false; 
+            btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
+
+            if (authOk && paciente) {
+                localStorage.setItem('bioclinlab_sesion', JSON.stringify({ 
+                    cedula: cedula, 
+                    nombre: paciente.nombre, 
+                    tipo: 'paciente', 
+                    fecha: new Date().toISOString(), 
+                    token: btoa(cedula+':'+Date.now()) 
+                }));
+                // Mostrar modal de bienvenida antes de redirigir
+                mostrarModal('success', '¡Bienvenido!', 
+                    'Hola ' + (paciente.nombre || 'paciente') + ', has iniciado sesión correctamente.', 
+                    {'Cédula': cedula, 'Nombre': paciente.nombre || '-'}, 
+                    function() { window.location.href = 'resultados.html'; }, 
+                    'Continuar'
+                );
+                return;
+            } else {
+                mostrarModal('error','Credenciales incorrectas', 
+                    errorMsg || 'La cédula o la contraseña no son correctas. Verifica e intenta de nuevo.', 
+                    null, null, 'Intentar de nuevo');
+            }
+        }
+
+        async function handleRegistro(e) {
+            e.preventDefault();
+            const cedula = document.getElementById('reg-cedula').value.trim();
+            const nombre = document.getElementById('reg-nombre').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const password2 = document.getElementById('reg-password2').value;
+            const telefono = document.getElementById('reg-telefono').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const btn = document.getElementById('btnRegistro');
+
+            // Validaciones básicas
+            if (!cedula || !nombre || !password) { 
+                mostrarModal('error','Campos obligatorios','Cédula, nombre y contraseña son obligatorios.',null,null,'Entendido'); 
+                return; 
+            }
+            if (password.length < 6) { 
+                mostrarModal('error','Contraseña muy corta','La contraseña debe tener al menos 6 caracteres.',null,null,'Entendido'); 
+                return; 
+            }
+            if (password !== password2) { 
+                mostrarModal('error','Contraseñas no coinciden','Las contraseñas ingresadas no son iguales. Inténtalo de nuevo.',null,null,'Entendido'); 
+                return; 
+            }
+
+            // Verificar si ya existe en Supabase (sin .single() para evitar 406)
+            let yaExisteSupabase = false;
+            let yaExisteLocal = false;
+
+            try { 
+                if (supabaseClient) { 
+                    const { data, error } = await supabaseClient.from('pacientes').select('cedula').eq('cedula',cedula).limit(1); 
+                    if (data && data.length > 0) yaExisteSupabase = true; 
+                    if (error) console.error('Error verificando existencia:', error);
+                } 
+            } catch(e){ console.log('Verificación Supabase:', e); }
+
+            if (pacientesLocal[cedula]) yaExisteLocal = true;
+
+            if (yaExisteSupabase || yaExisteLocal) {
+                cedulaTemporal = cedula;
+                mostrarModal('error','Cédula ya registrada','Esta cédula ya está registrada en nuestro sistema. Por favor inicia sesión con tu contraseña.',null,function(){
+                    mostrarLogin(); document.getElementById('login-cedula').value = cedulaTemporal; document.getElementById('login-password').focus();
+                },'Ir al login');
+                return;
+            }
+
+            btn.disabled = true; 
+            btn.innerHTML = '<span class="spinner"></span> Registrando...';
+
+            const nuevoPaciente = { 
+                cedula: cedula, 
+                nombre: nombre, 
+                password: password, 
+                telefono: telefono || null, 
+                email: email || null 
+            };
+
+            let registroExitoso = false;
+            let errorMsg = '';
+
+            // 1. Intentar guardar en Supabase PRIMERO
+            try { 
+                if (supabaseClient) { 
+                    console.log('Intentando insertar en Supabase:', nuevoPaciente);
+                    const { data, error } = await supabaseClient.from('pacientes').insert([nuevoPaciente]).select(); 
+                    if (error) {
+                        console.error('Error Supabase al insertar:', error);
+                        errorMsg = error.message || 'Error desconocido de Supabase';
+                    } else if (data && data.length > 0) {
+                        console.log('Insertado en Supabase correctamente:', data);
+                        registroExitoso = true;
+                    } else {
+                        errorMsg = 'No se recibió confirmación del servidor';
+                    }
+                } else {
+                    console.warn('supabaseClient no está disponible');
+                    errorMsg = 'Conexión con base de datos no disponible';
+                }
+            } catch(err){
+                console.error('Excepción al insertar en Supabase:', err);
+                errorMsg = err.message || 'Error de conexión';
+            }
+
+            // 2. Guardar en localStorage SIEMPRE (como respaldo o principal)
+            pacientesLocal[cedula] = nuevoPaciente;
+            localStorage.setItem('bioclinlab_pacientes_v2', JSON.stringify(pacientesLocal));
+            console.log('Guardado en localStorage');
+
+            btn.disabled = false; 
+            btn.innerHTML = '<i class="fas fa-save"></i> Registrarme';
+
+            if (registroExitoso) {
+                cedulaTemporal = cedula;
+                mostrarModal('success','¡Registro exitoso!','Tu cuenta ha sido creada correctamente en la base de datos. Ahora inicia sesión con tu cédula y contraseña.',{'Cédula':cedula,'Nombre':nombre},function(){
+                    mostrarLogin(); 
+                    document.getElementById('login-cedula').value = cedulaTemporal; 
+                    document.getElementById('login-password').value = ''; 
+                    document.getElementById('login-password').focus();
+                },'Iniciar Sesión');
+                // Limpiar formulario
+                document.getElementById('reg-cedula').value=''; 
+                document.getElementById('reg-nombre').value='';
+                document.getElementById('reg-password').value=''; 
+                document.getElementById('reg-password2').value='';
+                document.getElementById('reg-telefono').value=''; 
+                document.getElementById('reg-email').value='';
+            } else {
+                // Si falló Supabase pero se guardó en localStorage, avisamos
+                mostrarModal('error','Error al registrar en servidor', 
+                    (errorMsg ? errorMsg + '. ' : '') + 'Tus datos se guardaron localmente. Intenta iniciar sesión.', 
+                    null, null, 'Entendido');
+            }
+        }
+
+        function handleLoginEmpresa(e) {
+            e.preventDefault();
+            const user = document.getElementById('user-empresa').value.trim();
+            const pass = document.getElementById('pass-empresa').value;
+            if (!user || !pass) { mostrarModal('error','Campos incompletos','Completa todos los campos para continuar.',null,null,'Entendido'); return; }
+            localStorage.setItem('bioclinlab_sesion', JSON.stringify({ empresa: user, tipo: 'empresa', fecha: new Date().toISOString(), token: btoa(user+':'+Date.now()) }));
+            window.location.href = 'empresa.html?empresa=' + encodeURIComponent(user);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const sesion = localStorage.getItem('bioclinlab_sesion');
+            if (sesion) {
+                const s = JSON.parse(sesion);
+                const horas = (new Date() - new Date(s.fecha)) / 3600000;
+                if (horas < 8 && s.tipo === 'paciente' && s.cedula) document.getElementById('login-cedula').value = s.cedula;
+            }
+        });
+    </script>
+</body>
+</html>

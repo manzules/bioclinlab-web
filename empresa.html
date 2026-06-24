@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIOCLINLAB - Portal de Empresas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0EA5E9;
+            --primary-magenta: #C0266B;
+            --dark-blue: #0C4A6E;
+            --light-blue: #E0F2FE;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8FAFC;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --text-light: #94A3B8;
+            --border: #E2E8F0;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 260px;
+            background: linear-gradient(180deg, var(--dark-blue), #083344);
+            color: white;
+            padding: 20px 0;
+            z-index: 100;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-logo {
+            padding: 0 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-logo img { height: 40px; filter: brightness(0) invert(1); }
+        .sidebar-logo-text { font-size: 14px; font-weight: 700; color: white; line-height: 1.2; }
+        .sidebar-logo-text small { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.6); display: block; }
+        .sidebar-menu { list-style: none; padding: 0 12px; flex: 1; }
+        .sidebar-menu li { margin-bottom: 4px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; color: rgba(255,255,255,0.7);
+            text-decoration: none; border-radius: 10px;
+            font-size: 14px; font-weight: 500;
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-menu a.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+        .sidebar-menu i { width: 20px; text-align: center; font-size: 16px; }
+        .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer a {
+            display: flex; align-items: center; gap: 10px;
+            color: rgba(255,255,255,0.6); text-decoration: none;
+            font-size: 13px; transition: color 0.3s;
+        }
+        .sidebar-footer a:hover { color: white; }
+        .main-wrapper { margin-left: 260px; min-height: 100vh; }
+        .topbar {
+            background: var(--bg-white); padding: 14px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .topbar-title { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+        .topbar-breadcrumb { font-size: 13px; color: var(--text-gray); font-weight: 500; }
+        .topbar-right { display: flex; align-items: center; gap: 20px; }
+        .topbar-notif {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--bg-light); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-gray); cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .topbar-notif:hover { background: var(--light-blue); color: var(--primary-blue); }
+        .notif-badge {
+            position: absolute; top: -4px; right: -4px;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--primary-magenta); color: white;
+            font-size: 10px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .topbar-user { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 12px; border-radius: 10px; transition: background 0.3s; }
+        .topbar-user:hover { background: var(--bg-light); }
+        .topbar-avatar {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 14px; font-weight: 600;
+        }
+        .topbar-name { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+        .topbar-role { font-size: 12px; color: var(--text-gray); }
+        .user-dropdown {
+            position: absolute; top: 60px; right: 20px;
+            background: white; border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 8px 0; min-width: 220px; display: none; z-index: 100;
+            border: 1px solid var(--border);
+        }
+        .user-dropdown.show { display: block; }
+        .user-dropdown-header { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+        .user-dropdown-header .name { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+        .user-dropdown-header .role { font-size: 12px; color: var(--text-gray); }
+        .user-dropdown-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px; font-size: 13px; color: var(--text-dark);
+            text-decoration: none; transition: background 0.2s; cursor: pointer;
+        }
+        .user-dropdown-item:hover { background: var(--bg-light); }
+        .user-dropdown-item i { color: var(--primary-blue); width: 18px; }
+        .user-dropdown-item.logout { color: var(--danger); }
+        .user-dropdown-item.logout i { color: var(--danger); }
+        .content { padding: 30px; }
+        .alert {
+            padding: 14px 18px; border-radius: 12px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; font-weight: 500;
+        }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .alert-hidden { display: none; }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--bg-white); border-radius: 16px; padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: flex; align-items: center; gap: 16px; transition: all 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .stat-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+        }
+        .stat-icon.blue { background: var(--light-blue); color: var(--primary-blue); }
+        .stat-icon.green { background: #dcfce7; color: var(--success); }
+        .stat-icon.orange { background: #fef3c7; color: var(--warning); }
+        .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+        .stat-info h3 { font-size: 28px; font-weight: 700; color: var(--text-dark); line-height: 1; }
+        .stat-info p { font-size: 13px; color: var(--text-gray); margin-top: 4px; }
+        .section-card {
+            background: var(--bg-white); border-radius: 16px; padding: 24px;
+            margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+        }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .section-subtitle { font-size: 13px; color: var(--text-gray); margin-top: 2px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 10px;
+            font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600;
+            cursor: pointer; border: none; transition: all 0.3s ease; text-decoration: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #16a34a; transform: translateY(-2px); }
+        .btn-outline {
+            background: transparent; color: var(--text-gray); border: 2px solid var(--border);
+        }
+        .btn-outline:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .btn-sm { padding: 8px 16px; font-size: 12px; }
+        .btn-icon {
+            width: 36px; height: 36px; border-radius: 10px; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; transition: all 0.3s;
+        }
+        .btn-icon.view { background: var(--light-blue); color: var(--primary-blue); }
+        .btn-icon.pdf { background: #fee2e2; color: var(--danger); }
+        .btn-icon.edit { background: #fef3c7; color: var(--warning); }
+        .btn-icon:hover { transform: scale(1.1); }
+        .filters-row {
+            display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .filter-group { flex: 1; min-width: 180px; }
+        .filter-group label {
+            display: block; font-size: 12px; font-weight: 600; color: var(--text-gray);
+            margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .filter-input {
+            width: 100%; padding: 12px 14px; border: 2px solid var(--border);
+            border-radius: 10px; font-family: 'Poppins', sans-serif;
+            font-size: 14px; color: var(--text-dark);
+            transition: all 0.3s ease; outline: none;
+        }
+        .filter-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        .search-box { position: relative; flex: 1; min-width: 250px; }
+        .search-box i {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-light); font-size: 14px;
+        }
+        .search-box input {
+            width: 100%; padding: 12px 14px 12px 40px; border: 2px solid var(--border);
+            border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px;
+            outline: none; transition: all 0.3s;
+        }
+        .search-box input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table thead { background: var(--bg-light); }
+        .data-table th {
+            padding: 14px 16px; text-align: left; font-size: 12px; font-weight: 600;
+            color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table td {
+            padding: 14px 16px; font-size: 14px; color: var(--text-dark);
+            border-bottom: 1px solid var(--border); vertical-align: middle;
+        }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--bg-light); }
+        .data-table tr { transition: background 0.2s; }
+        .orden-numero { font-weight: 700; color: var(--primary-blue); font-size: 15px; }
+        .paciente-nombre { font-weight: 600; color: var(--text-dark); font-size: 14px; }
+        .paciente-nombre small { display: block; font-size: 12px; color: var(--text-gray); font-weight: 400; margin-top: 2px; }
+        .estado-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+        .estado-listo { background: #dcfce7; color: #166534; }
+        .estado-proceso { background: #fef3c7; color: #92400e; }
+        .estado-badge i { font-size: 10px; }
+        .analisis-tag {
+            display: inline-block; background: var(--light-blue); color: var(--dark-blue);
+            padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-bottom: 4px;
+        }
+        .muestra-tag {
+            display: inline-block; background: #f0fdf4; color: #166534;
+            padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+        }
+        .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-revisar {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: all 0.3s; border: none; cursor: pointer;
+            font-family: 'Poppins', sans-serif; background: var(--light-blue); color: var(--primary-blue);
+        }
+        .btn-revisar:hover { background: #bae6fd; }
+        .btn-pedido {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: all 0.3s; border: none; cursor: pointer;
+            font-family: 'Poppins', sans-serif; background: #f3e8ff; color: #7c3aed;
+        }
+        .btn-pedido:hover { background: #e9d5ff; }
+        .btn-log {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: all 0.3s; border: none; cursor: pointer;
+            font-family: 'Poppins', sans-serif; background: var(--bg-light); color: var(--text-gray); border: 1px solid var(--border);
+        }
+        .btn-log:hover { background: var(--border); }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .form-group { margin-bottom: 8px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 14px; border: 2px solid var(--border);
+            border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px;
+            color: var(--text-dark); transition: all 0.3s ease; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .catalogo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .catalogo-card {
+            background: var(--bg-white); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; transition: all 0.3s ease; cursor: pointer;
+        }
+        .catalogo-card:hover { border-color: var(--primary-blue); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.1); transform: translateY(-3px); }
+        .catalogo-card.active { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15); }
+        .catalogo-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; margin-bottom: 16px;
+        }
+        .catalogo-icon.hemato { background: #fee2e2; color: #991b1b; }
+        .catalogo-icon.bioquim { background: #dbeafe; color: #1e40af; }
+        .catalogo-icon.hormonal { background: #fce7f3; color: #9d174d; }
+        .catalogo-icon.inmuno { background: #d1fae5; color: #065f46; }
+        .catalogo-icon.micro { background: #fef3c7; color: #92400e; }
+        .catalogo-icon.especial { background: #e0e7ff; color: #3730a3; }
+        .catalogo-card h4 { font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+        .catalogo-card p { font-size: 13px; color: var(--text-gray); line-height: 1.5; margin-bottom: 12px; }
+        .catalogo-card .pruebas-count { font-size: 12px; font-weight: 600; color: var(--primary-blue); }
+        .catalogo-pruebas-list {
+            margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: none;
+        }
+        .catalogo-pruebas-list.show { display: block; }
+        .catalogo-pruebas-list ul { list-style: none; padding: 0; }
+        .catalogo-pruebas-list li {
+            font-size: 13px; color: var(--text-gray); padding: 6px 0;
+            border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+        }
+        .catalogo-pruebas-list li:last-child { border-bottom: none; }
+        .catalogo-pruebas-list li i { color: var(--primary-blue); font-size: 10px; }
+        .empty-state { padding: 60px 40px; text-align: center; }
+        .empty-icon { font-size: 48px; color: var(--text-light); margin-bottom: 16px; opacity: 0.5; }
+        .empty-text { font-size: 18px; font-weight: 700; color: var(--text-light); }
+        .empty-subtext { font-size: 13px; color: var(--text-gray); margin-top: 6px; }
+        .loading-state { padding: 60px 40px; text-align: center; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary-blue); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sort-btn { display: flex; align-items: center; gap: 6px; background: transparent; border: none; color: var(--primary-blue); font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: background 0.3s; }
+        .sort-btn:hover { background: var(--light-blue); }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .page-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: white; color: var(--text-dark); font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .page-btn:hover { background: var(--bg-light); border-color: var(--primary-blue); color: var(--primary-blue); }
+        .page-btn.active { background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta)); color: white; border-color: transparent; }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        @media (max-width: 1024px) {
+            .sidebar { width: 220px; }
+            .main-wrapper { margin-left: 220px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .catalogo-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main-wrapper { margin-left: 0; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .catalogo-grid { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .topbar { padding: 12px 16px; }
+            .content { padding: 16px; }
+            .filters-row { flex-direction: column; }
+            .filter-group, .search-box { min-width: 100%; }
+            .data-table { display: block; overflow-x: auto; }
+        }
+        .mobile-toggle { display: none; font-size: 20px; color: var(--text-dark); cursor: pointer; margin-right: 12px; }
+        @media (max-width: 768px) { .mobile-toggle { display: block; } }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+        .sidebar-overlay.show { display: block; }
+    
+        .examenes-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .exam-tag {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 500; border: 1px solid transparent;
+        }
+        .tag-hematologia { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .tag-bioquimica { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+        .tag-hormonal { background: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
+        .tag-inmunologia { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        .tag-microbiologia { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .tag-especial { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .tag-default { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+        .btn-descargar {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            color: white; border: none; border-radius: 8px;
+            font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600;
+            cursor: pointer; text-decoration: none; transition: all 0.3s ease;
+        }
+        .btn-descargar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+        }
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <img src="LOGO_BIOCLINLAB.png" alt="BIOCLINLAB">
+        <div class="sidebar-logo-text">
+            BIOCLINLAB
+            <small>Portal de Empresas</small>
+        </div>
+    </div>
+    <ul class="sidebar-menu">
+        <li><a href="#" class="active" onclick="showTab('resultados', this)"><i class="fas fa-file-medical-alt"></i> Resultados</a></li>
+        <li><a href="#" onclick="showTab('ingresar', this)"><i class="fas fa-plus-circle"></i> Ingresar Orden</a></li>
+        <li><a href="#" onclick="showTab('catalogo', this)"><i class="fas fa-list-alt"></i> Catalogo</a></li>
+    </ul>
+    <div class="sidebar-footer">
+        <a href="index.html"><i class="fas fa-arrow-left"></i> Volver al sitio</a>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <header class="topbar">
+        <div class="topbar-left">
+            <i class="fas fa-bars mobile-toggle" onclick="toggleSidebar()"></i>
+            <div>
+                <h1 class="topbar-title" id="pageTitle">Resultados</h1>
+                <div class="topbar-breadcrumb" id="pageBreadcrumb">Portal de Empresas / Resultados</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <div class="topbar-notif">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge">3</span>
+            </div>
+            <div class="topbar-user" onclick="toggleUserDropdown()">
+                <div>
+                    <div class="topbar-name" id="empresaNombre">Laboratorio San Jose</div>
+                    <div class="topbar-role">Empresa aliada</div>
+                </div>
+                <div class="topbar-avatar">
+                    <i class="fas fa-building"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+            <div class="name" id="dropdownEmpresa">Laboratorio San Jose</div>
+            <div class="role">Empresa aliada</div>
+        </div>
+        <a href="#" class="user-dropdown-item" onclick="alert('Funcion en desarrollo')">
+            <i class="fas fa-chart-bar"></i> Ingresos Web Reporte
+        </a>
+        <a href="#" class="user-dropdown-item" onclick="alert('Funcion en desarrollo')">
+            <i class="fas fa-lock"></i> Cambiar Contrasena
+        </a>
+        <a href="clientes.html" class="user-dropdown-item logout">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesion
+        </a>
+    </div>
+
+    <main class="content">
+        <div id="alertSuccess" class="alert alert-success alert-hidden">
+            <i class="fas fa-check-circle"></i>
+            <span id="alertSuccessText">Operacion exitosa</span>
+        </div>
+        <div id="alertError" class="alert alert-error alert-hidden">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="alertErrorText">Error en la operacion</span>
+        </div>
+        <div id="alertInfo" class="alert alert-info alert-hidden">
+            <i class="fas fa-info-circle"></i>
+            <span id="alertInfoText">Informacion</span>
+        </div>
+
+        <!-- RESULTADOS TAB -->
+        <div id="resultados" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-vial"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statTotal">0</h3>
+                        <p>Ordenes totales</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statListos">0</h3>
+                        <p>Resultados listos</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statProceso">0</h3>
+                        <p>En proceso</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-calendar-week"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statSemana">0</h3>
+                        <p>Esta semana</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="filtro-desde">Desde</label>
+                        <input type="date" id="filtro-desde" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filtro-hasta">Hasta</label>
+                        <input type="date" id="filtro-hasta" class="filter-input">
+                    </div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="buscar-orden" placeholder="Buscar: Orden">
+                    </div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="buscar-cedula" placeholder="Buscar: cedula o nombre">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Lista de resultados</h2>
+                        <p class="section-subtitle" id="subtituloResultados">Cargando...</p>
+                    </div>
+                    <button class="sort-btn" onclick="ordenarResultados()">
+                        <span>Ordenar por</span>
+                        <i class="fas fa-sort-amount-down"></i>
+                    </button>
+                </div>
+
+                <div class="loading-state" id="loadingResultados">
+                    <div class="loading-spinner"></div>
+                    <p class="empty-subtext">Cargando resultados...</p>
+                </div>
+
+                <div class="empty-state" id="emptyResultados" style="display:none;">
+                    <div class="empty-icon"><i class="fas fa-file-medical"></i></div>
+                    <p class="empty-text">NO HAY RESULTADOS PARA MOSTRAR</p>
+                    <p class="empty-subtext">Cuando tengas ordenes registradas, apareceran aqui.</p>
+                </div>
+
+                <div id="tablaResultadosContainer" style="display:none; overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>N Orden</th>
+                                <th>Fecha</th>
+                                <th>Paciente / Examenes</th>
+                                <th>Estado</th>
+                                <th>Accion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyResultados"></tbody>
+                    </table>
+                    <div class="pagination" id="paginationResultados"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INGRESAR ORDEN TAB -->
+        <div id="ingresar" class="tab-content">
+            <div class="section-card">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Ingresar nueva orden</h2>
+                        <p class="section-subtitle">Registra una nueva orden de trabajo para tu paciente</p>
+                    </div>
+                </div>
+                <form id="formOrden" onsubmit="registrarOrden(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="ordCedula">Cedula del paciente *</label>
+                            <input type="text" id="ordCedula" placeholder="Ej: 1234567890" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ordNombre">Nombre completo *</label>
+                            <input type="text" id="ordNombre" placeholder="Ej: Juan Perez Lopez" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ordTelefono">Telefono</label>
+                            <input type="text" id="ordTelefono" placeholder="Ej: 0991234567">
+                        </div>
+                        <div class="form-group">
+                            <label for="ordEmail">Email</label>
+                            <input type="email" id="ordEmail" placeholder="Ej: paciente@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="ordMedico">Medico tratante</label>
+                            <input type="text" id="ordMedico" placeholder="Ej: Dr. Carlos Garcia">
+                        </div>
+                        <div class="form-group">
+                            <label for="ordFecha">Fecha de orden *</label>
+                            <input type="date" id="ordFecha" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="ordExamenes">Examenes solicitados *</label>
+                            <textarea id="ordExamenes" placeholder="Ej: Hemograma Completo, Glucosa en ayunas, Creatinina, TSH..." required></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="ordMuestras">Tipo de muestras</label>
+                            <input type="text" id="ordMuestras" placeholder="Ej: Suero ayunas, EDTA completo, Orina de 24h...">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="ordObs">Observaciones</label>
+                            <textarea id="ordObs" placeholder="Observaciones adicionales sobre la orden..." style="min-height:60px;"></textarea>
+                        </div>
+                    </div>
+                    <div style="margin-top:24px; display:flex; gap:12px;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Orden
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('formOrden').reset()">
+                            <i class="fas fa-undo"></i> Limpiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Ordenes ingresadas recientemente</h2>
+                        <p class="section-subtitle">Ultimas ordenes registradas por tu empresa</p>
+                    </div>
+                </div>
+                <div id="tablaOrdenesIngresadasContainer">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>N Orden</th>
+                                <th>Paciente</th>
+                                <th>Fecha</th>
+                                <th>Examenes</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyOrdenesIngresadas">
+                            <tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:40px;">No hay ordenes registradas aun</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATALOGO TAB -->
+        <div id="catalogo" class="tab-content">
+            <div class="section-card">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Catalogo de pruebas</h2>
+                        <p class="section-subtitle">Conoce todas las pruebas disponibles en BIOCLINLAB</p>
+                    </div>
+                </div>
+                <div class="catalogo-grid">
+                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
+                        <div class="catalogo-icon hemato"><i class="fas fa-vial"></i></div>
+                        <h4>Hematologia Completa</h4>
+                        <p>Pruebas relacionadas con sangre, globulos rojos, blancos, plaquetas y coagulacion.</p>
+                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>8 pruebas</span>
+                        <div class="catalogo-pruebas-list">
+                            <ul>
+                                <li><i class="fas fa-check"></i> Hemograma completo (CBC)</li>
+                                <li><i class="fas fa-check"></i> Recuento de globulos rojos</li>
+                                <li><i class="fas fa-check"></i> Recuento de globulos blancos</li>
+                                <li><i class="fas fa-check"></i> Recuento de plaquetas</li>
+                                <li><i class="fas fa-check"></i> Hemoglobina y hematocrito</li>
+                                <li><i class="fas fa-check"></i> Formula leucocitaria diferencial</li>
+                                <li><i class="fas fa-check"></i> VHS (Velocidad de sedimentacion)</li>
+                                <li><i class="fas fa-check"></i> Grupo sanguineo y factor Rh</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
+                        <div class="catalogo-icon bioquim"><i class="fas fa-tint"></i></div>
+                        <h4>Bioquimica Sanguinea</h4>
+                        <p>Analisis de metabolitos, enzimas, lipidos y electrolitos en sangre.</p>
+                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>9 pruebas</span>
+                        <div class="catalogo-pruebas-list">
+                            <ul>
+                                <li><i class="fas fa-check"></i> Glucosa en ayunas y postprandial</li>
+                                <li><i class="fas fa-check"></i> Urea y creatinina</li>
+                                <li><i class="fas fa-check"></i> Acido urico</li>
+                                <li><i class="fas fa-check"></i> Perfil lipidico completo</li>
+                                <li><i class="fas fa-check"></i> Transaminasas (AST, ALT)</li>
+                                <li><i class="fas fa-check"></i> Fosfatasa alcalina y GGT</li>
+                                <li><i class="fas fa-check"></i> Bilirrubina total y fraccionada</li>
+                                <li><i class="fas fa-check"></i> Electrolitos (Na, K, Cl, Ca)</li>
+                                <li><i class="fas fa-check"></i> Proteinas totales y fracciones</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
+                        <div class="catalogo-icon hormonal"><i class="fas fa-dna"></i></div>
+                        <h4>Pruebas Hormonales</h4>
+                        <p>Evaluacion de funcion endocrina y metabolismo hormonal.</p>
+                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>8 pruebas</span>
+                        <div class="catalogo-pruebas-list">
+                            <ul>
+                                <li><i class="fas fa-check"></i> TSH, T3 libre, T4 libre</li>
+                                <li><i class="fas fa-check"></i> Prolactina</li>
+                                <li><i class="fas fa-check"></i> Estradiol y progesterona</li>
+                                <li><i class="fas fa-check"></i> Testosterona total y libre</li>
+                                <li><i class="fas fa-check"></i> FSH y LH</li>
+                                <li><i class="fas fa-check"></i> HCG (prueba de embarazo)</li>
+                                <li><i class="fas fa-check"></i> Cortisol</li>
+                                <li><i class="fas fa-check"></i> Insulina y HOMA-IR</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
+                        <div class="catalogo-icon inmuno"><i class="fas fa-shield-virus"></i></div>
+                        <h4>Inmunologia</h4>
+                        <p>Deteccion de anticuerpos, marcadores tumorales y pruebas inmunologicas.</p>
+                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>9 pruebas</span>
+                        <div class="catalogo-pruebas-list">
+                            <ul>
+                                <li><i class="fas fa-check"></i> Factor reumatoide (FR)</li>
+                                <li><i class="fas fa-check"></i> Anticuerpos anti-CCP</li>
+                                <li><i class="fas fa-check"></i> ANA (Anticuerpos antinucleares)</li>
+                                <li><i class="fas fa-check"></i> Anti-DNA</li>
+                                <li><i class="fas fa-check"></i> Inmunoglobulinas (IgA, IgG, IgM)</li>
+                                <li><i class="fas fa-check"></i> Proteina C reactiva (PCR)</li>
+                                <li><i class="fas fa-check"></i> Procalcitonina</li>
+                                <li><i class="fas fa-check"></i> Marcadores tumorales (CEA, CA 19-9, PSA)</li>
+                                <li><i class="fas fa-check"></i> Pruebas COVID-19</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
+                        <div class="catalogo-icon micro"><i class="fas fa-bacterium"></i></div>
+                        <h4>Microbiologia</h4>
+                        <p>Cultivos, identificacion bacteriana y pruebas de sensibilidad.</p>
+                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>9 pruebas</span>
+                        <div class="catalogo-pruebas-list">
+                            <ul>
+                                <li><i class="fas fa-check"></i> Urocultivo con antibiograma</li>
+                                <li><i class="fas fa-check"></i> Coprocultivo</li>
+                                <li><i class="fas fa-check"></i> Cultivo de secreciones</li>
+                                <li><i class="fas fa-check"></i> Hemocultivo</li>
+                                <li><i class="fas fa-check"></i> Tincion de Gram</li>
+                                <li><i class="fas fa-check"></i> Tincion de Ziehl-Neelsen (BAAR)</li>
+                                <li><i class="fas fa-check"></i> Examen directo de hongos (KOH)</li>
+                                <li><i class="fas fa-check"></i> Pruebas de sensibilidad antimicrobiana</li>
+                                <li><i class="fas fa-check"></i> Identificacion bacteriana automatizada</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
+                        <div class="catalogo-icon especial"><i class="fas fa-clipboard-check"></i></div>
+                        <h4>Pruebas Especiales</h4>
+                        <p>Pruebas especializadas de alto valor diagnostico.</p>
+                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>10 pruebas</span>
+                        <div class="catalogo-pruebas-list">
+                            <ul>
+                                <li><i class="fas fa-check"></i> HbA1c (Hemoglobina glicosilada)</li>
+                                <li><i class="fas fa-check"></i> Ferritina</li>
+                                <li><i class="fas fa-check"></i> Vitamina D (25-OH)</li>
+                                <li><i class="fas fa-check"></i> PSA total y libre</li>
+                                <li><i class="fas fa-check"></i> Prueba de embarazo en sangre</li>
+                                <li><i class="fas fa-check"></i> Troponina I</li>
+                                <li><i class="fas fa-check"></i> BNP / NT-proBNP</li>
+                                <li><i class="fas fa-check"></i> Dimero D</li>
+                                <li><i class="fas fa-check"></i> Homocisteina</li>
+                                <li><i class="fas fa-check"></i> Perfil tiroideo extendido</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+
+<script>
+
+const SUPABASE_URL = 'https://nbegepuaddvifdfeaaal.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZWdlcHVhZGR2aWZkZmVhYWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTEwNzUsImV4cCI6MjA5NzgyNzA3NX0.szcXAZ9D9SA3DkrHEpaZgLZKIHzdbZli02bChgAUxIQ';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const demoOrdenes = [
+    {
+        numero_orden: "1852162",
+        paciente_nombre: "CHIRIBOGA GANDARA, CAROLINA",
+        paciente_cedula: "1712332814",
+        fecha: "2026-06-20",
+        hora: "12:05",
+        medico: "Dr. .",
+        analisis: "NA K LITIO",
+        muestras: "SUERO AYUNAS (2026/06/20 16:05)",
+        estado: "listo",
+        empresa: "Laboratorio San Jose"
+    },
+    {
+        numero_orden: "1847638",
+        paciente_nombre: "PILALUMBO GUALOTUNA, ALEX MATEO",
+        paciente_cedula: "2351477753",
+        fecha: "2026-06-18",
+        hora: "11:15",
+        medico: "Dr. .",
+        analisis: "HORMONA ADRENOCORTICOTROPA",
+        muestras: "PLASMA CON EDTA (2026/06/18 17:00)",
+        estado: "proceso",
+        empresa: "Laboratorio San Jose"
+    },
+    {
+        numero_orden: "1863201",
+        paciente_nombre: "MENDOZA RUIZ, MARIA ELENA",
+        paciente_cedula: "0802567891",
+        fecha: "2026-06-22",
+        hora: "09:30",
+        medico: "Dra. Patricia Velez",
+        analisis: "HEMOGRAMA COMPLETO, GLUCOSA",
+        muestras: "EDTA COMPLETO, SUERO AYUNAS",
+        estado: "listo",
+        empresa: "Laboratorio San Jose"
+    },
+    {
+        numero_orden: "1864155",
+        paciente_nombre: "CASTRO PEREZ, JUAN CARLOS",
+        paciente_cedula: "0912345678",
+        fecha: "2026-06-23",
+        hora: "14:20",
+        medico: "Dr. Roberto Sanchez",
+        analisis: "PERFIL LIPIDICO, TSH, T4 LIBRE",
+        muestras: "SUERO AYUNAS",
+        estado: "proceso",
+        empresa: "Laboratorio San Jose"
+    }
+];
+
+let ordenesData = [...demoOrdenes];
+let ordenesIngresadas = [];
+
+function showTab(tabId, linkEl) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    if (linkEl) linkEl.classList.add('active');
+
+    const titles = {
+        resultados: { title: 'Resultados', breadcrumb: 'Portal de Empresas / Resultados' },
+        ingresar: { title: 'Ingresar Orden', breadcrumb: 'Portal de Empresas / Ingresar Orden' },
+        catalogo: { title: 'Catalogo', breadcrumb: 'Portal de Empresas / Catalogo' }
+    };
+    document.getElementById('pageTitle').textContent = titles[tabId].title;
+    document.getElementById('pageBreadcrumb').textContent = titles[tabId].breadcrumb;
+
+    if (tabId === 'resultados') cargarResultados();
+    if (tabId === 'ingresar') {
+        document.getElementById('ordFecha').value = new Date().toISOString().split('T')[0];
+    }
+}
+
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+
+function toggleUserDropdown() {
+    document.getElementById('userDropdown').classList.toggle('show');
+}
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.topbar-user')) {
+        document.getElementById('userDropdown').classList.remove('show');
+    }
+});
+
+function showAlert(type, message) {
+    const alertEl = document.getElementById(type === 'success' ? 'alertSuccess' : type === 'error' ? 'alertError' : 'alertInfo');
+    const textEl = document.getElementById(type === 'success' ? 'alertSuccessText' : type === 'error' ? 'alertErrorText' : 'alertInfoText');
+    textEl.textContent = message;
+    alertEl.classList.remove('alert-hidden');
+    setTimeout(() => alertEl.classList.add('alert-hidden'), 4000);
+}
+
+async function cargarResultados() {
+    const loading = document.getElementById('loadingResultados');
+    const empty = document.getElementById('emptyResultados');
+    const container = document.getElementById('tablaResultadosContainer');
+    const tbody = document.getElementById('tbodyResultados');
+    const subtitulo = document.getElementById('subtituloResultados');
+
+    loading.style.display = 'block';
+    empty.style.display = 'none';
+    container.style.display = 'none';
+
+    await new Promise(r => setTimeout(r, 600));
+
+    loading.style.display = 'none';
+
+    if (ordenesData.length === 0) {
+        empty.style.display = 'block';
+        subtitulo.textContent = '0 registro(s) encontrados';
+        return;
+    }
+
+    const total = ordenesData.length;
+    const listos = ordenesData.filter(o => o.estado === 'listo').length;
+    const proceso = ordenesData.filter(o => o.estado === 'proceso').length;
+    const hoy = new Date();
+    const semanaInicio = new Date(hoy); semanaInicio.setDate(hoy.getDate() - 7);
+    const estaSemana = ordenesData.filter(o => new Date(o.fecha) >= semanaInicio).length;
+
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statListos').textContent = listos;
+    document.getElementById('statProceso').textContent = proceso;
+    document.getElementById('statSemana').textContent = estaSemana;
+    subtitulo.textContent = total + ' registro(s) encontrados';
+
+    container.style.display = 'block';
+    tbody.innerHTML = ordenesData.map(o => {
+        const fechaStr = new Date(o.fecha).toLocaleDateString('es-ES');
+        const examenesTags = o.analisis.split(',').map(ex => {
+            const examen = ex.trim();
+            let tagClass = 'tag-default';
+            const examenUpper = examen.toUpperCase();
+            if (examenUpper.includes('HEMOGRAMA') || examenUpper.includes('HEMATO') || examenUpper.includes('PLAQUET') || examenUpper.includes('GLOBULO')) {
+                tagClass = 'tag-hematologia';
+            } else if (examenUpper.includes('GLUCOSA') || examenUpper.includes('CREATININA') || examenUpper.includes('UREA') || examenUpper.includes('COLESTEROL') || examenUpper.includes('TRIGLICERID') || examenUpper.includes('TRANSAMIN') || examenUpper.includes('BILIRRUBIN') || examenUpper.includes('PERFIL LIPIDICO') || examenUpper.includes('ELECTROLIT') || examenUpper.includes('LITIO') || examenUpper.includes('NA K')) {
+                tagClass = 'tag-bioquimica';
+            } else if (examenUpper.includes('TSH') || examenUpper.includes('T3') || examenUpper.includes('T4') || examenUpper.includes('PROLACTINA') || examenUpper.includes('ESTRADIOL') || examenUpper.includes('PROGESTERONA') || examenUpper.includes('TESTOSTERONA') || examenUpper.includes('FSH') || examenUpper.includes('LH') || examenUpper.includes('CORTISOL') || examenUpper.includes('INSULINA') || examenUpper.includes('HORMONA')) {
+                tagClass = 'tag-hormonal';
+            } else if (examenUpper.includes('FACTOR REUMAT') || examenUpper.includes('ANTICUERPO') || examenUpper.includes('INMUNOGLOBUL') || examenUpper.includes('PCR') || examenUpper.includes('PROCALCITON') || examenUpper.includes('MARCADOR') || examenUpper.includes('COVID')) {
+                tagClass = 'tag-inmunologia';
+            } else if (examenUpper.includes('UROCULTIVO') || examenUpper.includes('COPROCULTIVO') || examenUpper.includes('CULTIVO') || examenUpper.includes('ANTIBIOGRAMA') || examenUpper.includes('GRAM') || examenUpper.includes('HONGOS') || examenUpper.includes('BAAR')) {
+                tagClass = 'tag-microbiologia';
+            } else if (examenUpper.includes('HBA1C') || examenUpper.includes('FERRITINA') || examenUpper.includes('VITAMINA') || examenUpper.includes('PSA') || examenUpper.includes('TROPONINA') || examenUpper.includes('DIMERO') || examenUpper.includes('HOMOCISTEINA')) {
+                tagClass = 'tag-especial';
+            }
+            return `<span class="exam-tag ${tagClass}">${ex.trim()}</span>`;
+        }).join('');
+        return `
+            <tr>
+                <td><span class="orden-numero">${o.numero_orden}</span></td>
+                <td>${fechaStr}</td>
+                <td>
+                    <div style="margin-bottom:6px;">
+                        <strong style="color:var(--text-dark);font-size:14px;">${o.paciente_nombre}</strong>
+                        <small style="display:block;color:var(--text-gray);font-size:12px;">Cedula: ${o.paciente_cedula}</small>
+                    </div>
+                    <div class="examenes-tags">${examenesTags}</div>
+                </td>
+                <td>
+                    <span class="estado-badge estado-${o.estado}">
+                        <i class="fas fa-${o.estado === 'listo' ? 'check-circle' : 'clock'}"></i>
+                        ${o.estado === 'listo' ? 'LISTO' : 'EN PROCESO'}
+                    </span>
+                </td>
+                <td>
+                    ${o.estado === 'listo' 
+                        ? `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}')"><i class="fas fa-download"></i> Descargar</a>`
+                        : `<span style="color:var(--text-gray);font-size:13px;"><i class="fas fa-clock"></i> Pendiente</span>`
+                    }
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function descargarPDF(orden) {
+    alert('Descargando PDF de la orden ' + orden + '...\n(En produccion esto descargaria el PDF real desde Supabase Storage)');
+}
+
+let ordenAsc = false;
+function ordenarResultados() {
+    ordenAsc = !ordenAsc;
+    ordenesData.sort((a, b) => {
+        const dateA = new Date(a.fecha + 'T' + (a.hora || '00:00'));
+        const dateB = new Date(b.fecha + 'T' + (b.hora || '00:00'));
+        return ordenAsc ? dateA - dateB : dateB - dateA;
+    });
+    cargarResultados();
+}
+
+function registrarOrden(e) {
+    e.preventDefault();
+    const cedula = document.getElementById('ordCedula').value.trim();
+    const nombre = document.getElementById('ordNombre').value.trim();
+    const fecha = document.getElementById('ordFecha').value;
+    const examenes = document.getElementById('ordExamenes').value.trim();
+    const muestras = document.getElementById('ordMuestras').value.trim() || 'No especificado';
+
+    const nuevaOrden = {
+        numero_orden: String(1850000 + Math.floor(Math.random() * 99999)),
+        paciente_nombre: nombre.toUpperCase(),
+        paciente_cedula: cedula,
+        fecha: fecha,
+        hora: new Date().toTimeString().slice(0,5),
+        medico: document.getElementById('ordMedico').value.trim() || 'Dr. .',
+        analisis: examenes.toUpperCase(),
+        muestras: muestras.toUpperCase(),
+        estado: 'proceso',
+        empresa: 'Laboratorio San Jose'
+    };
+
+    ordenesData.unshift(nuevaOrden);
+    ordenesIngresadas.unshift(nuevaOrden);
+
+    showAlert('success', 'Orden ' + nuevaOrden.numero_orden + ' registrada correctamente');
+    document.getElementById('formOrden').reset();
+    document.getElementById('ordFecha').value = new Date().toISOString().split('T')[0];
+
+    actualizarOrdenesIngresadas();
+}
+
+function actualizarOrdenesIngresadas() {
+    const tbody = document.getElementById('tbodyOrdenesIngresadas');
+    if (ordenesIngresadas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:40px;">No hay ordenes registradas aun</td></tr>';
+        return;
+    }
+    tbody.innerHTML = ordenesIngresadas.map(o => {
+        const fechaStr = new Date(o.fecha).toLocaleDateString('es-ES') + ' ' + (o.hora || '');
+        return `
+            <tr>
+                <td><span class="orden-numero">${o.numero_orden}</span></td>
+                <td>
+                    <div class="paciente-nombre">
+                        ${o.paciente_nombre}
+                        <small>Cedula: ${o.paciente_cedula}</small>
+                    </div>
+                </td>
+                <td>${fechaStr}</td>
+                <td><span class="analisis-tag">${o.analisis}</span></td>
+                <td>
+                    <span class="estado-badge estado-${o.estado}">
+                        <i class="fas fa-${o.estado === 'listo' ? 'check-circle' : 'clock'}"></i>
+                        ${o.estado === 'listo' ? 'LISTO' : 'EN PROCESO'}
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function toggleCatalogo(card) {
+    const list = card.querySelector('.catalogo-pruebas-list');
+    list.classList.toggle('show');
+    card.classList.toggle('active');
+}
+
+// Set default dates
+const hoy = new Date();
+const hace30 = new Date(hoy); hace30.setDate(hace30.getDate() - 30);
+document.getElementById('filtro-desde').value = hace30.toISOString().split('T')[0];
+document.getElementById('filtro-hasta').value = hoy.toISOString().split('T')[0];
+
+// Leer empresa de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const empresaParam = urlParams.get('empresa');
+if (empresaParam) {
+    document.getElementById('empresaNombre').textContent = 'Empresa: ' + empresaParam;
+    document.getElementById('dropdownEmpresa').textContent = empresaParam;
+}
+
+// Load results on page load
+cargarResultados();
+</script>
+
+</body>
+</html>

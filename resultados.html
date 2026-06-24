@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIOCLINLAB - Mis Resultados</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0EA5E9;
+            --primary-magenta: #C0266B;
+            --dark-blue: #0C4A6E;
+            --light-blue: #E0F2FE;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8FAFC;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --text-light: #94A3B8;
+            --border: #E2E8F0;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--light-blue), #f0f9ff);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header img {
+            height: 60px;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--dark-blue);
+        }
+
+        .header p {
+            color: var(--text-gray);
+            margin-top: 6px;
+        }
+
+        .card {
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+
+        /* ===== USER BAR ===== */
+        .user-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, var(--light-blue), #f0f9ff);
+            border-radius: 14px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(14, 165, 233, 0.15);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: var(--dark-blue);
+            font-size: 15px;
+        }
+
+        .user-cedula {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: var(--danger);
+            border: 1.5px solid var(--danger);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* ===== DATE FILTERS ===== */
+        .date-filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .date-filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .date-filter-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .date-filter-group label i {
+            color: var(--primary-blue);
+        }
+
+        .date-filter-group input {
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .date-filter-group input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-pdf {
+            background: var(--danger);
+            color: white;
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 10px;
+            text-decoration: none;
+        }
+
+        .btn-pdf:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .btn-pdf:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== DATE SECTION ===== */
+        .date-section {
+            margin-bottom: 28px;
+        }
+
+        .date-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .date-header i {
+            color: var(--primary-blue);
+            font-size: 18px;
+        }
+
+        .date-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-transform: capitalize;
+        }
+
+        /* ===== RESULT ITEM ===== */
+        .result-item {
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            background: var(--bg-white);
+        }
+
+        .result-item:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 16px rgba(14, 165, 233, 0.08);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .result-orden {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .estado-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .estado-listo { background: #dcfce7; color: #166534; }
+        .estado-proceso { background: #fef3c7; color: #92400e; }
+
+        /* ===== EXAM PILLS ===== */
+        .examenes-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .exam-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .exam-pill i {
+            font-size: 11px;
+        }
+
+        .pill-blue { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+        .pill-green { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .pill-purple { background: #f3e8ff; color: #7c3aed; border-color: #e9d5ff; }
+        .pill-orange { background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+        .pill-pink { background: #fce7f3; color: #be185d; border-color: #fbcfe8; }
+        .pill-teal { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+        .pill-red { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .pill-yellow { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+        .pill-indigo { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .pagination-btn {
+            min-width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            background: var(--bg-white);
+            color: var(--text-dark);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            color: white;
+            border-color: transparent;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.nav {
+            padding: 0 16px;
+            gap: 6px;
+        }
+
+        /* ===== NO RESULTS ===== */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+        }
+
+        .no-results i {
+            font-size: 64px;
+            color: var(--border);
+            margin-bottom: 20px;
+        }
+
+        .no-results h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-hidden { display: none; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 16px; }
+            .card { padding: 20px; }
+            .date-filters { grid-template-columns: 1fr; }
+            .result-header { flex-direction: column; }
+            .user-bar { flex-direction: column; gap: 12px; }
+            .pagination { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <img src="logo_bioclinlab.png" alt="BIOCLINLAB">
+            <h1>Mis Resultados</h1>
+            <p>Consulta el historial de tus exámenes</p>
+        </div>
+
+        <div class="card" id="mainCard">
+            <!-- User bar -->
+            <div class="user-bar" id="userBar">
+                <div class="user-info">
+                    <div class="user-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div class="user-name" id="userName">Cargando...</div>
+                        <div class="user-cedula" id="userCedula">...</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+
+            <!-- Date filters -->
+            <div class="date-filters">
+                <div class="date-filter-group">
+                    <label for="fechaDesde"><i class="fas fa-calendar"></i> Desde</label>
+                    <input type="date" id="fechaDesde">
+                </div>
+                <div class="date-filter-group">
+                    <label for="fechaHasta"><i class="fas fa-calendar"></i> Hasta</label>
+                    <input type="date" id="fechaHasta">
+                </div>
+            </div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="buscarResultados()">
+                    <i class="fas fa-search"></i> Buscar resultados
+                </button>
+            </div>
+
+            <div id="alertError" class="alert alert-error alert-hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="alertErrorText"></span>
+            </div>
+
+            <div id="resultadosContainer">
+                <div class="no-results">
+                    <i class="fas fa-vial"></i>
+                    <h3>Selecciona un rango de fechas</h3>
+                    <p>Elige las fechas para ver tus resultados</p>
+                </div>
+            </div>
+
+            <div id="paginationContainer"></div>
+        </div>
+
+        <div class="footer">
+            <p>¿Necesitas ayuda? <a href="index.html#contacto">Contáctanos</a></p>
+        </div>
+    </div>
+
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://nbegepuaddvifdfeaaal.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZWdlcHVhZGR2aWZkZmVhYWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTEwNzUsImV4cCI6MjA5NzgyNzA3NX0.szcXAZ9D9SA3DkrHEpaZgLZKIHzdbZli02bChgAUxIQ';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Colores para los exámenes
+        const pillColors = ['pill-blue', 'pill-green', 'pill-purple', 'pill-orange', 'pill-pink', 'pill-teal', 'pill-red', 'pill-yellow', 'pill-indigo'];
+
+        // Variables de sesión y paginación
+        let cedulaUsuario = '';
+        let nombreUsuario = '';
+        let pacienteId = '';
+        let todosResultados = [];
+        let paginaActual = 1;
+        const resultadosPorPagina = 5;
+
+        function showError(message) {
+            const alertEl = document.getElementById('alertError');
+            document.getElementById('alertErrorText').textContent = message;
+            alertEl.classList.remove('alert-hidden');
+            setTimeout(() => alertEl.classList.add('alert-hidden'), 5000);
+        }
+
+        function getExamPills(examenesText) {
+            const examenes = examenesText.split(',').map(e => e.trim()).filter(e => e);
+            return examenes.map((examen, index) => {
+                const colorClass = pillColors[index % pillColors.length];
+                return `<span class="exam-pill ${colorClass}"><i class="fas fa-flask"></i> ${examen}</span>`;
+            }).join('');
+        }
+
+        function formatDateCompleta(fechaStr) {
+            const fecha = new Date(fechaStr + 'T00:00:00');
+            const dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            const diaSemana = dias[fecha.getDay()];
+            const dia = fecha.getDate();
+            const mes = meses[fecha.getMonth()];
+            const anio = fecha.getFullYear();
+            return `${diaSemana}, ${dia} de ${mes} de ${anio}`;
+        }
+
+        // ===== FORMATEAR HORA ECUADOR (UTC-5) =====
+        function formatHoraEcuador(timestampStr) {
+            if (!timestampStr) return '';
+            const fecha = new Date(timestampStr);
+            // Restar 5 horas para Ecuador (UTC-5)
+            fecha.setHours(fecha.getHours() - 5);
+            const horas = fecha.getHours();
+            const minutos = String(fecha.getMinutes()).padStart(2, '0');
+            const ampm = horas >= 12 ? 'PM' : 'AM';
+            const horas24 = String(horas).padStart(2, '0');
+            return horas24 + ':' + minutos + ' ' + ampm;
+        }
+
+
+        function groupByDate(resultados) {
+            const grupos = {};
+            resultados.forEach(r => {
+                const fechaKey = r.fecha_examen;
+                if (!grupos[fechaKey]) grupos[fechaKey] = [];
+                grupos[fechaKey].push(r);
+            });
+            return Object.keys(grupos).sort((a, b) => new Date(b) - new Date(a)).map(fecha => ({
+                fecha,
+                resultados: grupos[fecha]
+            }));
+        }
+
+        // ===== SESIÓN =====
+        function verificarSesion() {
+            const sesion = localStorage.getItem('bioclinlab_sesion');
+            if (!sesion) {
+                window.location.href = 'clientes.html';
+                return false;
+            }
+
+            const s = JSON.parse(sesion);
+            const horas = (new Date() - new Date(s.fecha)) / 3600000;
+
+            if (horas > 8 || s.tipo !== 'paciente' || !s.cedula) {
+                localStorage.removeItem('bioclinlab_sesion');
+                window.location.href = 'clientes.html';
+                return false;
+            }
+
+            cedulaUsuario = s.cedula;
+            nombreUsuario = s.nombre || 'Paciente';
+            document.getElementById('userName').textContent = nombreUsuario;
+            document.getElementById('userCedula').textContent = 'Cédula: ' + cedulaUsuario;
+            return true;
+        }
+
+        function cerrarSesion() {
+            if (!confirm('¿Estás seguro de que deseas cerrar sesión?')) return;
+            localStorage.removeItem('bioclinlab_sesion');
+            window.location.href = 'clientes.html';
+        }
+
+        // ===== BUSCAR RESULTADOS =====
+        async function buscarResultados() {
+            const fechaDesde = document.getElementById('fechaDesde').value;
+            const fechaHasta = document.getElementById('fechaHasta').value;
+            const container = document.getElementById('resultadosContainer');
+
+            if (!verificarSesion()) return;
+
+            container.innerHTML = '<div class="no-results"><i class="fas fa-spinner fa-spin" style="font-size:32px;color:var(--primary-blue);"></i><h3>Buscando resultados...</h3></div>';
+
+            try {
+                // Buscar paciente por cédula
+                const { data: paciente, error: errPac } = await supabaseClient
+                    .from('pacientes')
+                    .select('id, nombre')
+                    .eq('cedula', cedulaUsuario)
+                    .single();
+
+                if (errPac || !paciente) {
+                    container.innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-user-slash"></i>
+                            <h3>No se encontró información</h3>
+                            <p>No existe un paciente registrado con esta cédula</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                pacienteId = paciente.id;
+
+                // Construir query de resultados SOLO para este paciente
+                let query = supabaseClient
+                    .from('resultados')
+                    .select('*, pacientes(nombre, cedula), fecha_subida')
+                    .eq('paciente_id', paciente.id)
+                    .order('fecha_examen', { ascending: false })
+                    .order('numero_orden', { ascending: false });
+
+                // Aplicar filtros de fecha si existen
+                if (fechaDesde) query = query.gte('fecha_examen', fechaDesde);
+                if (fechaHasta) query = query.lte('fecha_examen', fechaHasta);
+
+                const { data: resultados, error } = await query;
+
+                if (error) {
+                    showError('Error al cargar resultados: ' + error.message);
+                    return;
+                }
+
+                todosResultados = resultados || [];
+                paginaActual = 1;
+
+                if (todosResultados.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-search"></i>
+                            <h3>No se encontraron resultados</h3>
+                            <p>No hay exámenes registrados en el rango de fechas seleccionado</p>
+                        </div>
+                    `;
+                    document.getElementById('paginationContainer').innerHTML = '';
+                    return;
+                }
+
+                renderResultados();
+
+            } catch (err) {
+                console.error(err);
+                showError('Error al buscar resultados. Intenta de nuevo.');
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error al cargar</h3>
+                        <p>Hubo un problema al obtener tus resultados</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ===== RENDER RESULTADOS CON PAGINACIÓN =====
+        function renderResultados() {
+            const container = document.getElementById('resultadosContainer');
+            const paginationContainer = document.getElementById('paginationContainer');
+
+            // Calcular paginación
+            const totalPaginas = Math.ceil(todosResultados.length / resultadosPorPagina);
+            const inicio = (paginaActual - 1) * resultadosPorPagina;
+            const fin = inicio + resultadosPorPagina;
+            const resultadosPagina = todosResultados.slice(inicio, fin);
+
+            // Agrupar por fecha
+            const grupos = groupByDate(resultadosPagina);
+
+            let html = `
+                <div style="font-size: 14px; color: var(--text-gray); margin-bottom: 20px;">
+                    <i class="fas fa-clipboard-list"></i> 
+                    Mostrando ${inicio + 1}-${Math.min(fin, todosResultados.length)} de ${todosResultados.length} resultado${todosResultados.length > 1 ? 's' : ''}
+                </div>
+            `;
+
+            html += grupos.map(grupo => {
+                const fechaFormateada = formatDateCompleta(grupo.fecha);
+
+                const resultadosHTML = grupo.resultados.map(r => {
+                    const tienePDF = r.pdf_url && r.pdf_url.length > 0;
+                    const estaListo = r.estado === 'listo';
+                    const examPills = getExamPills(r.examenes);
+
+                    return `
+                        <div class="result-item">
+                            <div class="result-header">
+                                <div>
+                                    <div class="result-orden">Orden #${r.numero_orden}</div>
+                                    <div style="font-size: 13px; color: var(--text-gray); margin-top: 4px;">
+                                        <i class="fas fa-calendar-alt"></i> ${formatDateCompleta(r.fecha_examen)}
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--text-light); margin-top: 2px;">
+                                        <i class="fas fa-clock"></i> ${formatHoraEcuador(r.fecha_subida)} (Hora Ecuador)
+                                    </div>
+                                </div>
+                                <span class="estado-badge estado-${r.estado}">${r.estado === 'listo' ? 'LISTO' : 'EN PROCESO'}</span>
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-dark); margin-bottom: 10px;">
+                                <i class="fas fa-user"></i> <strong>Paciente:</strong> ${r.pacientes?.nombre || 'N/A'}
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-gray); margin-bottom: 8px;">
+                                <i class="fas fa-vial"></i> <strong>Exámenes:</strong>
+                            </div>
+                            <div class="examenes-list">
+                                ${examPills}
+                            </div>
+                            <div class="result-actions" style="margin-top: 14px;">
+                                ${tienePDF && estaListo
+                                    ? `<a href="${r.pdf_url}" target="_blank" class="btn btn-pdf"><i class="fas fa-file-pdf"></i> Descargar PDF</a>`
+                                    : `<button class="btn btn-pdf" disabled><i class="fas fa-clock"></i> PDF no disponible</button>`
+                                }
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="date-section">
+                        <div class="date-header">
+                            <i class="fas fa-calendar-day"></i>
+                            <h3>${fechaFormateada}</h3>
+                        </div>
+                        ${resultadosHTML}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+
+            // Renderizar paginación
+            if (totalPaginas > 1) {
+                renderPagination(totalPaginas);
+            } else {
+                paginationContainer.innerHTML = '';
+            }
+        }
+
+        // ===== PAGINACIÓN =====
+        function renderPagination(totalPaginas) {
+            const container = document.getElementById('paginationContainer');
+            let html = '<div class="pagination">';
+
+            // Botón Anterior
+            html += `<button class="pagination-btn nav" onclick="cambiarPagina(${paginaActual - 1})" ${paginaActual === 1 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-left"></i> Anterior
+            </button>`;
+
+            // Números de página
+            for (let i = 1; i <= totalPaginas; i++) {
+                html += `<button class="pagination-btn ${i === paginaActual ? 'active' : ''}" onclick="cambiarPagina(${i})">${i}</button>`;
+            }
+
+            // Botón Siguiente
+            html += `<button class="pagination-btn nav" onclick="cambiarPagina(${paginaActual + 1})" ${paginaActual === totalPaginas ? 'disabled' : ''}>
+                Siguiente <i class="fas fa-chevron-right"></i>
+            </button>`;
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function cambiarPagina(nuevaPagina) {
+            const totalPaginas = Math.ceil(todosResultados.length / resultadosPorPagina);
+            if (nuevaPagina < 1 || nuevaPagina > totalPaginas) return;
+            paginaActual = nuevaPagina;
+            renderResultados();
+            document.getElementById('resultadosContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar sesión
+            if (!verificarSesion()) return;
+
+            // Set default date range (last 30 days)
+            const hoy = new Date();
+            const hace30dias = new Date();
+            hace30dias.setDate(hoy.getDate() - 30);
+
+            document.getElementById('fechaHasta').value = hoy.toISOString().split('T')[0];
+            document.getElementById('fechaDesde').value = hace30dias.toISOString().split('T')[0];
+
+            // Auto-buscar al cargar
+            buscarResultados();
+        });
+    </script>
+
+</body>
+</html>
