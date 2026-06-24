@@ -54,15 +54,18 @@
         .sidebar-logo-text small { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.6); display: block; }
         .sidebar-menu { list-style: none; padding: 0 12px; flex: 1; }
         .sidebar-menu li { margin-bottom: 4px; }
-        .sidebar-menu a {
+        .sidebar-menu a, .sidebar-menu button {
             display: flex; align-items: center; gap: 12px;
             padding: 12px 16px; color: rgba(255,255,255,0.7);
             text-decoration: none; border-radius: 10px;
             font-size: 14px; font-weight: 500;
             transition: all 0.3s ease; cursor: pointer;
+            background: transparent; border: none; width: 100%;
+            font-family: 'Poppins', sans-serif; text-align: left;
         }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.1); color: white; }
-        .sidebar-menu a.active {
+        .sidebar-menu a:hover, .sidebar-menu button:hover,
+        .sidebar-menu a.active, .sidebar-menu button.active { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-menu a.active, .sidebar-menu button.active {
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
             box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
         }
@@ -399,11 +402,11 @@
         </div>
     </div>
     <ul class="sidebar-menu">
-        <li><a href="#" class="active" onclick="showTab('resultados', this)"><i class="fas fa-file-medical-alt"></i> Resultados</a></li>
-        <li><a href="#" onclick="showTab('ingresar', this)"><i class="fas fa-plus-circle"></i> Ingresar Orden</a></li>
-        <li><a href="#" onclick="showTab('catalogo', this)"><i class="fas fa-list-alt"></i> Catalogo</a></li>
+        <li><button class="active" onclick="showTab('resultados', this)"><i class="fas fa-file-medical-alt"></i> Resultados</button></li>
+        <li><button onclick="showTab('ingresar', this)"><i class="fas fa-plus-circle"></i> Ingresar Orden</button></li>
+        <li><button onclick="showTab('catalogo', this)"><i class="fas fa-list-alt"></i> Catalogo</button></li>
     </ul>
-    <!-- Footer eliminado - el usuario sale mediante el botón Salir -->
+
 </aside>
 
 <div class="main-wrapper">
@@ -836,7 +839,7 @@ let ordenesIngresadas = [];
 
 function showTab(tabId, linkEl) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+    document.querySelectorAll('.sidebar-menu button').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     if (linkEl) linkEl.classList.add('active');
 
