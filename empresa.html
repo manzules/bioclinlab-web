@@ -400,7 +400,46 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
         }
-</style>
+
+        .btn-anular {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: all 0.3s; border: none; cursor: pointer;
+            font-family: 'Poppins', sans-serif; background: var(--danger); color: white;
+        }
+        .btn-anular:hover { background: #dc2626; transform: translateY(-1px); }
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: none; align-items: center; justify-content: center; z-index: 200;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white; border-radius: 16px; padding: 28px;
+            max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-box h3 { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+        .modal-box p { font-size: 13px; color: var(--text-gray); margin-bottom: 16px; }
+        .modal-box textarea {
+            width: 100%; padding: 12px 14px; border: 2px solid var(--border);
+            border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px;
+            color: var(--text-dark); resize: vertical; min-height: 100px; outline: none;
+            transition: all 0.3s;
+        }
+        .modal-box textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        .modal-box .error-msg { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; }
+        .modal-box .error-msg.show { display: block; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+        .modal-actions .btn { padding: 10px 20px; }
+        .modal-actions .btn-cancel { background: var(--bg-light); color: var(--text-gray); border: 1px solid var(--border); }
+        .modal-actions .btn-cancel:hover { background: var(--border); }
+        .modal-actions .btn-confirm { background: var(--danger); color: white; }
+        .modal-actions .btn-confirm:hover { background: #dc2626; }
+
+    </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -785,6 +824,22 @@
             </div>
         </div>
 
+    
+    <!-- MODAL ANULAR ORDEN -->
+    <div class="modal-overlay" id="modalAnular">
+        <div class="modal-box">
+            <h3><i class="fas fa-exclamation-triangle" style="color:var(--danger);margin-right:8px;"></i>Anular Orden</h3>
+            <p>Estas a punto de anular la orden <strong id="modalAnularOrdenNum"></strong>. Este cambio no se puede deshacer.</p>
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:6px;">Motivo de anulacion *</label>
+            <textarea id="motivoAnulacionInput" placeholder="Ej: Paciente cancelo la cita, Error en datos del paciente, Muestra insuficiente..."></textarea>
+            <div class="error-msg" id="errorMotivo"><i class="fas fa-exclamation-circle"></i> Debes ingresar un motivo para anular.</div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="cerrarModalAnular()"><i class="fas fa-times"></i> Cancelar</button>
+                <button class="btn btn-confirm" onclick="confirmarAnulacion()"><i class="fas fa-ban"></i> Anular Orden</button>
+            </div>
+        </div>
+    </div>
+
     </main>
 </div>
 
@@ -1103,6 +1158,66 @@ function actualizarOrdenesIngresadas() {
         `;
     }).join('');
 }
+
+let ordenAnularActual = null;
+
+function abrirModalAnular(orden) {
+    ordenAnularActual = orden;
+    document.getElementById('modalAnularOrdenNum').textContent = '#' + orden;
+    document.getElementById('motivoAnulacionInput').value = '';
+    document.getElementById('errorMotivo').classList.remove('show');
+    document.getElementById('modalAnular').classList.add('show');
+}
+
+function cerrarModalAnular() {
+    document.getElementById('modalAnular').classList.remove('show');
+    ordenAnularActual = null;
+}
+
+async function confirmarAnulacion() {
+    const motivo = document.getElementById('motivoAnulacionInput').value.trim();
+    if (!motivo) {
+        document.getElementById('errorMotivo').classList.add('show');
+        return;
+    }
+    document.getElementById('errorMotivo').classList.remove('show');
+
+    const empresaNombre = document.getElementById('empresaNombre').textContent.replace('Empresa: ', '').trim() || 'Empresa desconocida';
+
+    try {
+        const { error } = await supabaseClient
+            .from('resultados')
+            .update({
+                estado: 'anulado',
+                motivo_anulacion: motivo,
+                anulado_por: empresaNombre
+            })
+            .eq('numero_orden', ordenAnularActual);
+
+        if (error) {
+            showAlert('error', 'Error al anular: ' + error.message);
+            return;
+        }
+
+        showAlert('success', 'Orden #' + ordenAnularActual + ' anulada correctamente');
+        cerrarModalAnular();
+        await cargarResultadosDesdeSupabase();
+
+    } catch (err) {
+        showAlert('error', 'Error de conexion: ' + err.message);
+        console.error(err);
+    }
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('modalAnular').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalAnular();
+});
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') cerrarModalAnular();
+});
 
 function toggleCatalogo(card) {
     const list = card.querySelector('.catalogo-pruebas-list');
