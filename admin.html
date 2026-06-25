@@ -1472,6 +1472,7 @@
                 pacientes: 'Gestión de Pacientes',
                 resultados: 'Gestión de Resultados',
                 pedidos: 'Pedidos de Empresas',
+                catalogo: 'Catálogo de Exámenes',
                 empresas: 'Empresas',
                 config: 'Configuración'
             };
@@ -1484,6 +1485,7 @@
             if (tabId === 'pacientes') cargarPacientes();
             if (tabId === 'resultados') cargarResultadosAdmin();
             if (tabId === 'pedidos') cargarPedidosAdmin();
+            if (tabId === 'catalogo') cargarExamenes();
         }
 
         function toggleSidebar() {
@@ -2543,6 +2545,218 @@
             renderCalendario();
             if (diaSeleccionado) {
                 mostrarPedidosDelDia(diaSeleccionado);
+            }
+        }
+
+        // ===== VARIABLES PARA EXÁMENES =====
+        let todosExamenes = [];
+
+        // ===== CARGAR EXÁMENES =====
+        async function cargarExamenes() {
+            try {
+                const { data: examenes, error } = await supabaseClient
+                    .from('examenes')
+                    .select('*')
+                    .order('nombre', { ascending: true });
+
+                if (error) {
+                    console.error('Error cargando exámenes:', error);
+                    showAlert('error', 'Error al cargar catálogo: ' + error.message);
+                    return;
+                }
+
+                todosExamenes = examenes || [];
+                renderExamenes(todosExamenes);
+
+            } catch (err) {
+                console.error('Error cargando exámenes:', err);
+                showAlert('error', 'Error de conexión al cargar catálogo');
+            }
+        }
+
+        // ===== RENDER EXÁMENES =====
+        function renderExamenes(examenes) {
+            const tbody = document.getElementById('tablaExamenes');
+            if (!examenes || examenes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-flask" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.3;"></i>No hay exámenes registrados</td></tr>';
+                return;
+            }
+
+            const categorias = {
+                hematologia: 'Hematología',
+                quimica: 'Química Clínica',
+                inmunologia: 'Inmunología',
+                microbiologia: 'Microbiología',
+                urianalisis: 'Urianálisis',
+                hormonas: 'Hormonas',
+                especial: 'Pruebas Especiales',
+                otros: 'Otros'
+            };
+
+            tbody.innerHTML = examenes.map(e => {
+                const catDisplay = categorias[e.categoria] || e.categoria || '-';
+                const precioDisplay = e.precio ? '$' + parseFloat(e.precio).toFixed(2) : '-';
+                return `
+                <tr>
+                    <td><strong style="color:var(--primary-blue);">${e.codigo || '-'}</strong></td>
+                    <td>${e.nombre}</td>
+                    <td><span class="estado-badge" style="background:var(--light-blue);color:var(--primary-blue);">${catDisplay}</span></td>
+                    <td>${precioDisplay}</td>
+                    <td>${e.descripcion || '-'}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn edit" title="Editar" onclick="abrirEditarExamen('${e.id}', '${e.codigo || ''}', '${e.nombre}', '${e.categoria || ''}', '${e.precio || ''}', '${e.descripcion || ''}')"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Eliminar" onclick="eliminarExamen('${e.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        // ===== FILTRAR EXÁMENES =====
+        function filtrarExamenes() {
+            const texto = document.getElementById('buscarExamen').value.toLowerCase().trim();
+            if (!texto) {
+                renderExamenes(todosExamenes);
+                return;
+            }
+            const filtrados = todosExamenes.filter(e =>
+                (e.codigo && e.codigo.toLowerCase().includes(texto)) ||
+                e.nombre.toLowerCase().includes(texto) ||
+                (e.categoria && e.categoria.toLowerCase().includes(texto))
+            );
+            renderExamenes(filtrados);
+        }
+
+        // ===== GUARDAR NUEVO EXAMEN =====
+        async function guardarExamen(e) {
+            e.preventDefault();
+            const codigo = document.getElementById('exCodigo').value.trim();
+            const nombre = document.getElementById('exNombre').value.trim();
+            const categoria = document.getElementById('exCategoria').value;
+            const precio = document.getElementById('exPrecio').value;
+            const descripcion = document.getElementById('exDescripcion').value.trim();
+
+            setLoading('btnGuardarExamen', true);
+
+            try {
+                // Verificar si el código ya existe
+                if (codigo) {
+                    const { data: existente } = await supabaseClient
+                        .from('examenes')
+                        .select('id')
+                        .eq('codigo', codigo)
+                        .single();
+
+                    if (existente) {
+                        showAlert('error', 'Ya existe un examen con ese código');
+                        setLoading('btnGuardarExamen', false);
+                        return;
+                    }
+                }
+
+                const insertData = { nombre, categoria };
+                if (codigo) insertData.codigo = codigo;
+                if (precio) insertData.precio = parseFloat(precio);
+                if (descripcion) insertData.descripcion = descripcion;
+
+                const { error } = await supabaseClient
+                    .from('examenes')
+                    .insert([insertData]);
+
+                if (error) {
+                    showAlert('error', 'Error: ' + error.message);
+                    setLoading('btnGuardarExamen', false);
+                    return;
+                }
+
+                showAlert('success', 'Examen guardado correctamente');
+                cerrarModal('modalNuevoExamen');
+                document.getElementById('formExamen').reset();
+                cargarExamenes();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+                console.error(err);
+            } finally {
+                setLoading('btnGuardarExamen', false);
+            }
+        }
+
+        // ===== ABRIR MODAL EDITAR EXAMEN =====
+        function abrirEditarExamen(id, codigo, nombre, categoria, precio, descripcion) {
+            document.getElementById('editExId').value = id;
+            document.getElementById('editExCodigo').value = codigo || '';
+            document.getElementById('editExNombre').value = nombre;
+            document.getElementById('editExCategoria').value = categoria || '';
+            document.getElementById('editExPrecio').value = precio || '';
+            document.getElementById('editExDescripcion').value = descripcion || '';
+            abrirModal('modalEditarExamen');
+        }
+
+        // ===== ACTUALIZAR EXAMEN =====
+        async function actualizarExamen(e) {
+            e.preventDefault();
+            const id = document.getElementById('editExId').value;
+            const codigo = document.getElementById('editExCodigo').value.trim();
+            const nombre = document.getElementById('editExNombre').value.trim();
+            const categoria = document.getElementById('editExCategoria').value;
+            const precio = document.getElementById('editExPrecio').value;
+            const descripcion = document.getElementById('editExDescripcion').value.trim();
+
+            setLoading('btnActualizarExamen', true);
+
+            try {
+                const updateData = { nombre, categoria };
+                if (codigo) updateData.codigo = codigo;
+                if (precio) updateData.precio = parseFloat(precio);
+                else updateData.precio = null;
+                if (descripcion) updateData.descripcion = descripcion;
+                else updateData.descripcion = null;
+
+                const { error } = await supabaseClient
+                    .from('examenes')
+                    .update(updateData)
+                    .eq('id', id);
+
+                if (error) {
+                    showAlert('error', 'Error al actualizar: ' + error.message);
+                    setLoading('btnActualizarExamen', false);
+                    return;
+                }
+
+                showAlert('success', 'Examen actualizado correctamente');
+                cerrarModal('modalEditarExamen');
+                cargarExamenes();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+                console.error(err);
+            } finally {
+                setLoading('btnActualizarExamen', false);
+            }
+        }
+
+        // ===== ELIMINAR EXAMEN =====
+        async function eliminarExamen(id) {
+            if (!confirm('¿Estás seguro de eliminar este examen?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('examenes')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    showAlert('error', 'Error al eliminar: ' + error.message);
+                    return;
+                }
+
+                showAlert('success', 'Examen eliminado');
+                cargarExamenes();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
             }
         }
 
