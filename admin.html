@@ -507,6 +507,22 @@
             color: #9333ea;
         }
 
+        .estado-pedido-solicitado { background: #dbeafe; color: #1e40af; }
+        .estado-pedido-descargado { background: #dcfce7; color: #166534; }
+
+        .btn-estado {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: default;
+            font-family: 'Poppins', sans-serif;
+        }
+
         .action-btn:hover { transform: scale(1.1); }
 
         /* ===== MODAL ===== */
@@ -680,6 +696,7 @@
             .section-header { flex-direction: column; align-items: stretch; }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -692,6 +709,7 @@
             <li><a href="#" class="active" onclick="showTab('dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</a></li>
             <li><a href="#" onclick="showTab('pacientes', this)"><i class="fas fa-users"></i> Pacientes</a></li>
             <li><a href="#" onclick="showTab('resultados', this)"><i class="fas fa-vial"></i> Resultados</a></li>
+            <li><a href="#" onclick="showTab('pedidos', this)"><i class="fas fa-clipboard-list"></i> Pedidos</a></li>
             <li><a href="#" onclick="showTab('empresas', this)"><i class="fas fa-building"></i> Empresas</a></li>
             <li><a href="#" onclick="showTab('config', this)"><i class="fas fa-cog"></i> Configuración</a></li>
         </ul>
@@ -916,7 +934,36 @@
                 </div>
             </div>
 
-            <!-- ===== EMPRESAS TAB ===== -->
+            
+            <!-- ===== PEDIDOS TAB ===== -->
+            <div id="pedidos" class="tab-content">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Pedidos de empresas</h2>
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="buscarPedido" placeholder="Buscar por orden, empresa o paciente..." oninput="filtrarPedidos()">
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Orden</th>
+                                <th>Fecha creacion</th>
+                                <th>Servicio / Tipo atencion</th>
+                                <th>Cliente (Empresa)</th>
+                                <th>Paciente</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPedidos">
+                            <tr><td colspan="6" style="text-align:center;color:var(--text-gray);">Cargando pedidos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+<!-- ===== EMPRESAS TAB ===== -->
             <div id="empresas" class="tab-content">
                 <div class="section-card">
                     <div class="section-header">
@@ -1051,6 +1098,7 @@
                 dashboard: 'Dashboard',
                 pacientes: 'Gestión de Pacientes',
                 resultados: 'Gestión de Resultados',
+                pedidos: 'Pedidos de Empresas',
                 empresas: 'Empresas',
                 config: 'Configuración'
             };
@@ -1062,6 +1110,7 @@
             if (tabId === 'dashboard') cargarDashboard();
             if (tabId === 'pacientes') cargarPacientes();
             if (tabId === 'resultados') cargarResultadosAdmin();
+            if (tabId === 'pedidos') cargarPedidosAdmin();
         }
 
         function toggleSidebar() {
@@ -1753,6 +1802,74 @@
                 console.error('Error general:', err);
                 showAlert('error', 'Error de conexión: ' + (err.message || 'desconocido'));
             }
+        }
+
+        
+        // ===== VARIABLES PARA PEDIDOS =====
+        let todosPedidos = [];
+
+        // ===== CARGAR PEDIDOS (ADMIN) =====
+        async function cargarPedidosAdmin() {
+            try {
+                const { data: resultados, error } = await supabaseClient
+                    .from('resultados')
+                    .select('*, pacientes(nombre, cedula)')
+                    .order('fecha_examen', { ascending: false })
+                    .order('numero_orden', { ascending: false });
+
+                todosPedidos = resultados || [];
+                renderPedidos(todosPedidos);
+
+            } catch (err) {
+                console.error('Error cargando pedidos:', err);
+            }
+        }
+
+        // ===== RENDER PEDIDOS =====
+        function renderPedidos(pedidos) {
+            const tbody = document.getElementById('tablaPedidos');
+            if (!pedidos || pedidos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-gray);">No hay pedidos registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pedidos.map(p => {
+                const fechaCreacion = new Date(p.fecha_examen).toLocaleDateString('es-ES');
+                const horaCreacion = p.fecha_subida ? new Date(p.fecha_subida).toTimeString().slice(0,5) : '';
+                const fechaCompleta = fechaCreacion + (horaCreacion ? ' ' + horaCreacion : '');
+
+                // Estado: solicitado (azul) o descargado (verde)
+                // Por ahora todo es SOLICITADO
+                const estadoClass = 'estado-pedido-solicitado';
+                const estadoTexto = 'SOLICITADO';
+                const estadoIcono = 'clock';
+
+                return `
+                <tr>
+                    <td><strong style="color:var(--primary-blue);">${p.numero_orden}</strong></td>
+                    <td>${fechaCompleta}</td>
+                    <td><span class="analisis-tag">${p.examenes}</span></td>
+                    <td><strong>${p.empresa || 'Empresa'}</strong></td>
+                    <td>${p.pacientes?.nombre || 'N/A'}<br><small style="color:var(--text-gray);">${p.pacientes?.cedula || ''}</small></td>
+                    <td><span class="btn-estado ${estadoClass}"><i class="fas fa-${estadoIcono}"></i> ${estadoTexto}</span></td>
+                </tr>
+            `}).join('');
+        }
+
+        // ===== FILTRAR PEDIDOS =====
+        function filtrarPedidos() {
+            const texto = document.getElementById('buscarPedido').value.toLowerCase().trim();
+            if (!texto) {
+                renderPedidos(todosPedidos);
+                return;
+            }
+            const filtrados = todosPedidos.filter(p =>
+                p.numero_orden.toLowerCase().includes(texto) ||
+                (p.pacientes?.nombre || '').toLowerCase().includes(texto) ||
+                (p.pacientes?.cedula || '').toLowerCase().includes(texto) ||
+                p.examenes.toLowerCase().includes(texto)
+            );
+            renderPedidos(filtrados);
         }
 
         // ===== INICIAR =====
