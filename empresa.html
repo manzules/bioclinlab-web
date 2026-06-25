@@ -796,58 +796,7 @@ const SUPABASE_URL = 'https://nbegepuaddvifdfeaaal.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZWdlcHVhZGR2aWZkZmVhYWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTEwNzUsImV4cCI6MjA5NzgyNzA3NX0.szcXAZ9D9SA3DkrHEpaZgLZKIHzdbZli02bChgAUxIQ';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const demoOrdenes = [
-    {
-        numero_orden: "1852162",
-        paciente_nombre: "CHIRIBOGA GANDARA, CAROLINA",
-        paciente_cedula: "1712332814",
-        fecha: "2026-06-20",
-        hora: "12:05",
-        medico: "Dr. .",
-        analisis: "NA K LITIO",
-        muestras: "SUERO AYUNAS (2026/06/20 16:05)",
-        estado: "listo",
-        empresa: "Laboratorio San Jose"
-    },
-    {
-        numero_orden: "1847638",
-        paciente_nombre: "PILALUMBO GUALOTUNA, ALEX MATEO",
-        paciente_cedula: "2351477753",
-        fecha: "2026-06-18",
-        hora: "11:15",
-        medico: "Dr. .",
-        analisis: "HORMONA ADRENOCORTICOTROPA",
-        muestras: "PLASMA CON EDTA (2026/06/18 17:00)",
-        estado: "proceso",
-        empresa: "Laboratorio San Jose"
-    },
-    {
-        numero_orden: "1863201",
-        paciente_nombre: "MENDOZA RUIZ, MARIA ELENA",
-        paciente_cedula: "0802567891",
-        fecha: "2026-06-22",
-        hora: "09:30",
-        medico: "Dra. Patricia Velez",
-        analisis: "HEMOGRAMA COMPLETO, GLUCOSA",
-        muestras: "EDTA COMPLETO, SUERO AYUNAS",
-        estado: "listo",
-        empresa: "Laboratorio San Jose"
-    },
-    {
-        numero_orden: "1864155",
-        paciente_nombre: "CASTRO PEREZ, JUAN CARLOS",
-        paciente_cedula: "0912345678",
-        fecha: "2026-06-23",
-        hora: "14:20",
-        medico: "Dr. Roberto Sanchez",
-        analisis: "PERFIL LIPIDICO, TSH, T4 LIBRE",
-        muestras: "SUERO AYUNAS",
-        estado: "proceso",
-        empresa: "Laboratorio San Jose"
-    }
-];
-
-let ordenesData = [...demoOrdenes];
+let ordenesData = [];
 let ordenesIngresadas = [];
 
 function showTab(tabId, linkEl) {
