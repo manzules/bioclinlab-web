@@ -963,15 +963,20 @@ async function cargarResultados() {
                 </td>
                 <td>
                     <span class="estado-badge estado-${o.estado}">
-                        <i class="fas fa-${o.estado === 'listo' ? 'check-circle' : 'clock'}"></i>
-                        ${o.estado === 'listo' ? 'LISTO' : 'EN PROCESO'}
+                        <i class="fas fa-${o.estado === 'listo' ? 'check-circle' : o.estado === 'anulado' ? 'ban' : 'clock'}"></i>
+                        ${o.estado === 'listo' ? 'LISTO' : o.estado === 'anulado' ? 'ANULADO' : 'SOLICITADO'}
                     </span>
                 </td>
                 <td>
-                    ${o.estado === 'listo' 
-                        ? `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}')"><i class="fas fa-download"></i> Descargar</a>`
-                        : `<span style="color:var(--text-gray);font-size:13px;"><i class="fas fa-clock"></i> Pendiente</span>`
-                    }
+                    <div class="action-btns">
+                        ${o.estado === 'listo' 
+                            ? `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}')"><i class="fas fa-download"></i> Descargar</a>`
+                            : o.estado === 'anulado'
+                                ? `<span style="color:var(--danger);font-size:13px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`
+                                : `<button class="btn-icon edit" onclick="editarOrden('${o.numero_orden}')" title="Editar"><i class="fas fa-edit"></i></button>
+                                   <button class="btn-icon delete" onclick="anularOrden('${o.numero_orden}')" title="Anular solicitud"><i class="fas fa-times-circle"></i></button>`
+                        }
+                    </div>
                 </td>
             </tr>
         `;
@@ -1090,8 +1095,8 @@ function actualizarOrdenesIngresadas() {
                 <td><span class="analisis-tag">${o.analisis}</span></td>
                 <td>
                     <span class="estado-badge estado-${o.estado}">
-                        <i class="fas fa-${o.estado === 'listo' ? 'check-circle' : 'clock'}"></i>
-                        ${o.estado === 'listo' ? 'LISTO' : 'EN PROCESO'}
+                        <i class="fas fa-${o.estado === 'listo' ? 'check-circle' : o.estado === 'anulado' ? 'ban' : 'clock'}"></i>
+                        ${o.estado === 'listo' ? 'LISTO' : o.estado === 'anulado' ? 'ANULADO' : 'SOLICITADO'}
                     </span>
                 </td>
             </tr>
