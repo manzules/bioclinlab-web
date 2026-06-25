@@ -1038,8 +1038,44 @@ async function cargarResultados() {
     }).join('');
 }
 
-function descargarPDF(orden) {
-    alert('Descargando PDF de la orden ' + orden + '...\n(En produccion esto descargaria el PDF real desde Supabase Storage)');
+async function descargarPDF(orden) {
+    try {
+        // Construir el nombre del archivo esperado
+        const fileName = orden + '.pdf';
+
+        // Obtener URL pública del bucket resultados-pdf
+        const { data } = supabaseClient
+            .storage
+            .from('resultados-pdf')
+            .getPublicUrl(fileName);
+
+        if (!data || !data.publicUrl) {
+            showAlert('error', 'No se pudo obtener el PDF de la orden ' + orden);
+            return;
+        }
+
+        // Verificar si el archivo existe haciendo un HEAD request
+        const response = await fetch(data.publicUrl, { method: 'HEAD' });
+
+        if (!response.ok) {
+            showAlert('info', 'PDF no disponible aun para la orden ' + orden);
+            return;
+        }
+
+        // Descargar el archivo
+        const a = document.createElement('a');
+        a.href = data.publicUrl + '?download=' + fileName;
+        a.download = 'Resultado_' + orden + '.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        showAlert('success', 'Descargando PDF de la orden ' + orden);
+
+    } catch (err) {
+        console.error('Error descargando PDF:', err);
+        showAlert('error', 'Error al descargar el PDF');
+    }
 }
 
 let ordenAsc = false;
