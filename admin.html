@@ -42,29 +42,32 @@
             padding: 24px 0;
             z-index: 100;
             overflow-y: auto;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, width 0.3s ease;
+            transform: translateX(-200px);
+            width: 60px;
+            padding: 24px 0;
         }
-
+        .sidebar:hover {
+            transform: translateX(0);
+            width: 260px;
+        }
         .sidebar-logo {
             padding: 0 24px 24px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-
-        .sidebar-logo img {
-            height: 45px;
-            filter: brightness(0) invert(1);
+        .sidebar:hover .sidebar-logo {
+            opacity: 1;
         }
-
         .sidebar-menu {
             list-style: none;
             padding: 0 12px;
         }
-
         .sidebar-menu li {
             margin-bottom: 4px;
         }
-
         .sidebar-menu a, .sidebar-menu button {
             display: flex;
             align-items: center;
@@ -82,8 +85,8 @@
             width: 100%;
             font-family: 'Poppins', sans-serif;
             text-align: left;
+            white-space: nowrap;
         }
-
         .sidebar-menu a:hover,
         .sidebar-menu button:hover,
         .sidebar-menu a.active,
@@ -91,25 +94,35 @@
             background: rgba(255,255,255,0.1);
             color: white;
         }
-
         .sidebar-menu a.active,
         .sidebar-menu button.active {
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
         }
-
         .sidebar-menu i {
             width: 20px;
             text-align: center;
+            font-size: 18px;
+            flex-shrink: 0;
         }
-
+        .sidebar-menu span {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar:hover .sidebar-menu span {
+            opacity: 1;
+        }
         .sidebar-footer {
             position: absolute;
             bottom: 0;
             left: 0; right: 0;
             padding: 20px 24px;
             border-top: 1px solid rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-
+        .sidebar:hover .sidebar-footer {
+            opacity: 1;
+        }
         .sidebar-footer a {
             display: flex;
             align-items: center;
@@ -119,14 +132,32 @@
             font-size: 13px;
             transition: color 0.3s;
         }
-
         .sidebar-footer a:hover { color: white; }
+        .sidebar-toggle-icon {
+            position: fixed;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 99;
+            color: white;
+            font-size: 20px;
+            opacity: 1;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .sidebar:hover + .sidebar-toggle-icon,
+        .sidebar:hover ~ .sidebar-toggle-icon {
+            opacity: 0;
+        }
 
         /* ===== MAIN CONTENT ===== */
         .main-wrapper {
-            margin-left: 260px;
+            margin-left: 60px;
             min-height: 100vh;
             transition: margin-left 0.3s ease;
+        }
+        .sidebar:hover ~ .main-wrapper {
+            margin-left: 260px;
         }
 
         .topbar {
@@ -707,53 +738,56 @@
         /* ===== CALENDARIO ===== */
         .calendario-container {
             background: var(--bg-white);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .calendario-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
         .calendario-nav {
             display: flex;
-            gap: 8px;
+            gap: 4px;
         }
         .cal-nav-btn {
-            width: 36px; height: 36px;
-            border-radius: 8px;
+            width: 28px; height: 28px;
+            border-radius: 6px;
             border: 1px solid var(--border);
             background: white;
             color: var(--text-dark);
             font-family: 'Poppins', sans-serif;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: flex; align-items: center; justify-content: center;
         }
         .cal-nav-btn:hover { background: var(--bg-light); border-color: var(--primary-blue); color: var(--primary-blue); }
-        .cal-nav-btn.hoy { padding: 0 14px; width: auto; font-size: 13px; }
+        .cal-nav-btn.hoy { padding: 0 10px; width: auto; font-size: 11px; }
         .calendario-titulo {
-            font-size: 20px; font-weight: 700; color: var(--text-dark);
+            font-size: 16px; font-weight: 700; color: var(--text-dark);
         }
         .calendario-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 4px;
         }
         .cal-dia-header {
             text-align: center;
-            font-size: 12px; font-weight: 600; color: var(--text-gray);
+            font-size: 10px; font-weight: 600; color: var(--text-gray);
             text-transform: uppercase;
-            padding: 8px 0;
+            padding: 4px 0;
         }
         .cal-dia {
             aspect-ratio: 1;
-            border-radius: 12px;
+            border-radius: 8px;
             border: 1px solid var(--border);
             background: white;
             display: flex;
@@ -763,7 +797,8 @@
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
-            min-height: 60px;
+            min-height: 36px;
+            font-size: 12px;
         }
         .cal-dia:hover { border-color: var(--primary-blue); background: var(--light-blue); }
         .cal-dia.seleccionado { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
@@ -771,22 +806,22 @@
         .cal-dia.seleccionado .cal-pedidos-count { background: white; color: var(--primary-blue); }
         .cal-dia.otro-mes { color: var(--text-light); background: var(--bg-light); }
         .cal-dia.hoy { border-color: var(--primary-magenta); border-width: 2px; }
-        .cal-numero { font-size: 16px; font-weight: 600; color: var(--text-dark); }
+        .cal-numero { font-size: 13px; font-weight: 600; color: var(--text-dark); }
         .cal-pedidos-count {
-            position: absolute; bottom: 4px;
+            position: absolute; bottom: 2px;
             background: var(--primary-blue); color: white;
-            font-size: 10px; font-weight: 700;
-            padding: 2px 6px; border-radius: 10px;
-            min-width: 18px; text-align: center;
+            font-size: 9px; font-weight: 700;
+            padding: 1px 4px; border-radius: 8px;
+            min-width: 14px; text-align: center;
         }
         .cal-pedidos-count.hidden { display: none; }
 
         /* ===== FILTROS PEDIDOS ===== */
         .filtros-pedidos {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 16px;
         }
         .filtro-group { display: flex; flex-direction: column; gap: 6px; }
         .filtro-group label { font-size: 12px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -830,6 +865,7 @@
 <body>
 
     <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar-toggle-icon"><i class="fas fa-bars"></i></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
             <img src="logo_bioclinlab.png" alt="BIOCLINLAB">
