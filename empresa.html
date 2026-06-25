@@ -1029,7 +1029,7 @@ async function cargarResultados() {
                             ? `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}')"><i class="fas fa-download"></i> Descargar</a>`
                             : o.estado === 'anulado'
                                 ? `<span style="color:var(--danger);font-size:13px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`
-                                : `<button class="btn-icon edit" onclick="editarOrden('${o.numero_orden}')" title="Editar"><i class="fas fa-edit"></i></button>`
+                                : `<span style="color:var(--text-gray);font-size:13px;">-</span>`
                         }
                     </div>
                 </td>
@@ -1139,11 +1139,14 @@ function actualizarOrdenesIngresadas() {
         const fechaStr = new Date(o.fecha).toLocaleDateString('es-ES') + ' ' + (o.hora || '');
         let accionHtml = '';
         if (o.estado === 'proceso' || o.estado === 'solicitado') {
-            accionHtml = `<button class="btn-anular" onclick="abrirModalAnular('${o.numero_orden}')"><i class="fas fa-ban"></i> Anular</button>`;
+            accionHtml = `<div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-revisar" onclick="editarOrden('${o.numero_orden}')" title="Editar"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn-anular" onclick="abrirModalAnular('${o.numero_orden}')"><i class="fas fa-ban"></i> Anular</button>
+            </div>`;
         } else if (o.estado === 'anulado') {
             accionHtml = `<span style="color:var(--danger);font-size:12px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`;
         } else {
-            accionHtml = `<span style="color:var(--success);font-size:12px;font-weight:600;"><i class="fas fa-check-circle"></i> Completada</span>`;
+            accionHtml = `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}')"><i class="fas fa-download"></i> Descargar</a>`;
         }
         return `
             <tr>
