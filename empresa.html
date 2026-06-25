@@ -687,6 +687,7 @@
                                 <th>Fecha</th>
                                 <th>Examenes</th>
                                 <th>Estado</th>
+                                <th>Accion</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyOrdenesIngresadas">
@@ -1028,8 +1029,7 @@ async function cargarResultados() {
                             ? `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}')"><i class="fas fa-download"></i> Descargar</a>`
                             : o.estado === 'anulado'
                                 ? `<span style="color:var(--danger);font-size:13px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`
-                                : `<button class="btn-icon edit" onclick="editarOrden('${o.numero_orden}')" title="Editar"><i class="fas fa-edit"></i></button>
-                                   <button class="btn-anular" onclick="abrirModalAnular('${o.numero_orden}')"><i class="fas fa-ban"></i> Anular</button>`
+                                : `<button class="btn-icon edit" onclick="editarOrden('${o.numero_orden}')" title="Editar"><i class="fas fa-edit"></i></button>`
                         }
                     </div>
                 </td>
@@ -1130,13 +1130,21 @@ async function registrarOrden(e) {
 function actualizarOrdenesIngresadas() {
     const tbody = document.getElementById('tbodyOrdenesIngresadas');
     if (ordenesData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:40px;">No hay ordenes registradas aun</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-gray);padding:40px;">No hay ordenes registradas aun</td></tr>';
         return;
     }
     // Mostrar solo las últimas 10 ordenes
     const ultimas = ordenesData.slice(0, 10);
     tbody.innerHTML = ultimas.map(o => {
         const fechaStr = new Date(o.fecha).toLocaleDateString('es-ES') + ' ' + (o.hora || '');
+        let accionHtml = '';
+        if (o.estado === 'proceso' || o.estado === 'solicitado') {
+            accionHtml = `<button class="btn-anular" onclick="abrirModalAnular('${o.numero_orden}')"><i class="fas fa-ban"></i> Anular</button>`;
+        } else if (o.estado === 'anulado') {
+            accionHtml = `<span style="color:var(--danger);font-size:12px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`;
+        } else {
+            accionHtml = `<span style="color:var(--success);font-size:12px;font-weight:600;"><i class="fas fa-check-circle"></i> Completada</span>`;
+        }
         return `
             <tr>
                 <td><span class="orden-numero">${o.numero_orden}</span></td>
@@ -1154,6 +1162,7 @@ function actualizarOrdenesIngresadas() {
                         ${o.estado === 'listo' ? 'LISTO' : o.estado === 'anulado' ? 'ANULADO' : 'SOLICITADO'}
                     </span>
                 </td>
+                <td>${accionHtml}</td>
             </tr>
         `;
     }).join('');
