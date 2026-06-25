@@ -2178,6 +2178,52 @@
         }
 
         
+        // ===== CARGAR EMPRESAS PARA FILTROS Y FORMULARIO =====
+        async function cargarEmpresasFiltro() {
+            try {
+                const { data: empresas, error } = await supabaseClient
+                    .from('empresas')
+                    .select('id, nombre')
+                    .order('nombre', { ascending: true });
+
+                if (error) {
+                    console.error('Error cargando empresas:', error);
+                    return;
+                }
+
+                // Llenar select de filtros
+                const filtroCliente = document.getElementById('filtroCliente');
+                if (filtroCliente) {
+                    filtroCliente.innerHTML = '<option value="">Cliente</option>';
+                    (empresas || []).forEach(emp => {
+                        filtroCliente.innerHTML += `<option value="${emp.nombre}">${emp.nombre}</option>`;
+                    });
+                }
+
+                // Llenar select de formulario de resultado
+                const resEmpresa = document.getElementById('resEmpresa');
+                if (resEmpresa) {
+                    resEmpresa.innerHTML = '<option value="">Sin empresa</option>';
+                    (empresas || []).forEach(emp => {
+                        resEmpresa.innerHTML += `<option value="${emp.nombre}">${emp.nombre}</option>`;
+                    });
+                }
+
+                // Llenar select de médicos (de los resultados existentes)
+                const filtroMedico = document.getElementById('filtroMedico');
+                if (filtroMedico && todosResultados.length > 0) {
+                    const medicos = [...new Set(todosResultados.map(r => r.medico).filter(m => m))];
+                    filtroMedico.innerHTML = '<option value="">Médico</option>';
+                    medicos.forEach(med => {
+                        filtroMedico.innerHTML += `<option value="${med}">${med}</option>`;
+                    });
+                }
+
+            } catch (err) {
+                console.error('Error cargando empresas:', err);
+            }
+        }
+
         // ===== VARIABLES PARA PEDIDOS =====
         let todosPedidos = [];
         let fechaCalendarioActual = new Date();
@@ -2193,7 +2239,11 @@
                     .order('numero_orden', { ascending: false });
 
                 todosPedidos = resultados || [];
+                todosPedidosFiltrados = [];
                 renderCalendario();
+
+                // Cargar empresas y médicos para filtros
+                await cargarEmpresasFiltro();
 
                 // Si hay un dia seleccionado, mostrar sus pedidos
                 if (diaSeleccionado) {
@@ -2280,12 +2330,13 @@
             const tbody = document.getElementById('tablaPedidosDia');
             const tituloFecha = document.getElementById('pedidosDiaFecha');
             const countEl = document.getElementById('pedidosDiaCount');
+            const pedidos = todosPedidosFiltrados.length > 0 ? todosPedidosFiltrados : todosPedidos;
 
             const fecha = new Date(fechaStr + 'T12:00:00');
             const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             tituloFecha.textContent = fecha.toLocaleDateString('es-ES', opciones);
 
-            const pedidosDelDia = todosPedidos.filter(p => {
+            const pedidosDelDia = pedidos.filter(p => {
                 const fechaP = new Date(p.fecha_examen).toISOString().split('T')[0];
                 return fechaP === fechaStr;
             });
@@ -2302,6 +2353,9 @@
                 const fechaCreacion = new Date(p.fecha_examen).toLocaleDateString('es-ES');
                 const horaCreacion = p.fecha_subida ? new Date(p.fecha_subida).toTimeString().slice(0,5) : '';
                 const fechaCompleta = fechaCreacion + (horaCreacion ? ' ' + horaCreacion : '');
+                const empresaDisplay = p.empresa || 'Sin empresa';
+                const serviciosDisplay = p.servicios ? p.servicios.charAt(0).toUpperCase() + p.servicios.slice(1) : 'Laboratorio';
+                const tipoAtencionDisplay = p.tipo_atencion ? p.tipo_atencion.charAt(0).toUpperCase() + p.tipo_atencion.slice(1) : 'Particular';
 
                 const estadoClass = 'estado-pedido-solicitado';
                 const estadoTexto = 'SOLICITADO';
@@ -2311,8 +2365,8 @@
                 <tr>
                     <td><strong style="color:var(--primary-blue);">${p.numero_orden}</strong></td>
                     <td>${fechaCompleta}</td>
-                    <td><span class="analisis-tag">${p.examenes}</span></td>
-                    <td><strong>${p.empresa || 'Empresa'}</strong></td>
+                    <td><span class="analisis-tag">${serviciosDisplay} / ${tipoAtencionDisplay}</span></td>
+                    <td><strong>${empresaDisplay}</strong></td>
                     <td>${p.pacientes?.nombre || 'N/A'}<br><small style="color:var(--text-gray);">${p.pacientes?.cedula || ''}</small></td>
                     <td><span class="btn-estado ${estadoClass}"><i class="fas fa-${estadoIcono}"></i> ${estadoTexto}</span></td>
                 </tr>
@@ -2321,12 +2375,158 @@
 
         // ===== FILTROS PEDIDOS =====
         function aplicarFiltrosPedidos() {
-            // Por ahora solo recarga el calendario con los datos actuales
-            // Los filtros se implementaran cuando tengamos las columnas necesarias
-            renderCalendario();
-            if (diaSeleccionado) {
-                mostrarPedidosDelDia(diaSeleccionado);
+            const cliente = document.getElementById('filtroCliente').value;
+            const categoria = document.getElementById('filtroCategoria').value;
+            const generado = document.getElementById('filtroGenerado').value;
+            const tipoAtencion = document.getElementById('filtroTipoAtencion').value;
+            const servicios = document.getElementById('filtroServicios').value;
+            const fechaDesde = document.getElementById('filtroFechaDesde').value;
+            const fechaHasta = document.getElementById('filtroFechaHasta').value;
+            const medico = document.getElementById('filtroMedico').value;
+            const buscar = document.getElementById('buscarPedido').value.toLowerCase().trim();
+
+            // Filtrar todosPedidos (que son los resultados)
+            let filtrados = [...todosPedidos];
+
+            if (cliente) {
+                filtrados = filtrados.filter(p => p.empresa === cliente);
             }
+            if (categoria) {
+                filtrados = filtrados.filter(p => p.categoria === categoria);
+            }
+            if (generado) {
+                filtrados = filtrados.filter(p => p.generado === generado);
+            }
+            if (tipoAtencion) {
+                filtrados = filtrados.filter(p => p.tipo_atencion === tipoAtencion);
+            }
+            if (servicios) {
+                filtrados = filtrados.filter(p => p.servicios === servicios);
+            }
+            if (fechaDesde) {
+                filtrados = filtrados.filter(p => new Date(p.fecha_examen) >= new Date(fechaDesde));
+            }
+            if (fechaHasta) {
+                filtrados = filtrados.filter(p => new Date(p.fecha_examen) <= new Date(fechaHasta));
+            }
+            if (medico) {
+                filtrados = filtrados.filter(p => p.medico === medico);
+            }
+            if (buscar) {
+                filtrados = filtrados.filter(p => 
+                    (p.numero_orden && p.numero_orden.toLowerCase().includes(buscar)) ||
+                    (p.pacientes?.nombre && p.pacientes.nombre.toLowerCase().includes(buscar)) ||
+                    (p.pacientes?.cedula && p.pacientes.cedula.toLowerCase().includes(buscar)) ||
+                    (p.examenes && p.examenes.toLowerCase().includes(buscar))
+                );
+            }
+
+            // Actualizar el calendario con los pedidos filtrados
+            todosPedidosFiltrados = filtrados;
+            renderCalendarioFiltrado();
+
+            if (diaSeleccionado) {
+                mostrarPedidosDelDiaFiltrados(diaSeleccionado);
+            }
+        }
+
+        let todosPedidosFiltrados = [];
+
+        function renderCalendarioFiltrado() {
+            const grid = document.getElementById('calendarioGrid');
+            const titulo = document.getElementById('calendarioTitulo');
+            const pedidos = todosPedidosFiltrados.length > 0 ? todosPedidosFiltrados : todosPedidos;
+
+            const año = fechaCalendarioActual.getFullYear();
+            const mes = fechaCalendarioActual.getMonth();
+
+            const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            titulo.textContent = nombresMeses[mes] + ' ' + año;
+
+            const primerDiaSemana = new Date(año, mes, 1).getDay();
+            const diasEnMes = new Date(año, mes + 1, 0).getDate();
+
+            const diasSemana = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+            let html = '';
+
+            diasSemana.forEach(d => {
+                html += `<div class="cal-dia-header">${d}</div>`;
+            });
+
+            let espaciosInicio = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1;
+
+            for (let i = 0; i < espaciosInicio; i++) {
+                html += `<div class="cal-dia" style="visibility:hidden;"></div>`;
+            }
+
+            const hoy = new Date();
+            for (let dia = 1; dia <= diasEnMes; dia++) {
+                const fechaStr = `${año}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                const pedidosDelDia = pedidos.filter(p => {
+                    const fechaP = new Date(p.fecha_examen).toISOString().split('T')[0];
+                    return fechaP === fechaStr;
+                });
+                const count = pedidosDelDia.length;
+                const esHoy = hoy.getFullYear() === año && hoy.getMonth() === mes && hoy.getDate() === dia;
+                const esSeleccionado = diaSeleccionado === fechaStr;
+
+                html += `<div class="cal-dia ${esHoy ? 'hoy' : ''} ${esSeleccionado ? 'seleccionado' : ''}" 
+                    onclick="seleccionarDia('${fechaStr}')">
+                    <span class="cal-numero">${dia}</span>
+                    ${count > 0 ? `<span class="cal-pedidos-count">${count}</span>` : ''}
+                </div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        function mostrarPedidosDelDiaFiltrados(fechaStr) {
+            const card = document.getElementById('pedidosDiaCard');
+            const tbody = document.getElementById('tablaPedidosDia');
+            const tituloFecha = document.getElementById('pedidosDiaFecha');
+            const countEl = document.getElementById('pedidosDiaCount');
+            const pedidos = todosPedidosFiltrados.length > 0 ? todosPedidosFiltrados : todosPedidos;
+
+            const fecha = new Date(fechaStr + 'T12:00:00');
+            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            tituloFecha.textContent = fecha.toLocaleDateString('es-ES', opciones);
+
+            const pedidosDelDia = pedidos.filter(p => {
+                const fechaP = new Date(p.fecha_examen).toISOString().split('T')[0];
+                return fechaP === fechaStr;
+            });
+
+            countEl.textContent = pedidosDelDia.length + ' pedido(s) encontrados';
+            card.style.display = 'block';
+
+            if (pedidosDelDia.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.3;"></i>No hay pedidos para este dia</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pedidosDelDia.map(p => {
+                const fechaCreacion = new Date(p.fecha_examen).toLocaleDateString('es-ES');
+                const horaCreacion = p.fecha_subida ? new Date(p.fecha_subida).toTimeString().slice(0,5) : '';
+                const fechaCompleta = fechaCreacion + (horaCreacion ? ' ' + horaCreacion : '');
+                const empresaDisplay = p.empresa || 'Sin empresa';
+                const serviciosDisplay = p.servicios ? p.servicios.charAt(0).toUpperCase() + p.servicios.slice(1) : 'Laboratorio';
+                const tipoAtencionDisplay = p.tipo_atencion ? p.tipo_atencion.charAt(0).toUpperCase() + p.tipo_atencion.slice(1) : 'Particular';
+
+                const estadoClass = 'estado-pedido-solicitado';
+                const estadoTexto = 'SOLICITADO';
+                const estadoIcono = 'clock';
+
+                return `
+                <tr>
+                    <td><strong style="color:var(--primary-blue);">${p.numero_orden}</strong></td>
+                    <td>${fechaCompleta}</td>
+                    <td><span class="analisis-tag">${serviciosDisplay} / ${tipoAtencionDisplay}</span></td>
+                    <td><strong>${empresaDisplay}</strong></td>
+                    <td>${p.pacientes?.nombre || 'N/A'}<br><small style="color:var(--text-gray);">${p.pacientes?.cedula || ''}</small></td>
+                    <td><span class="btn-estado ${estadoClass}"><i class="fas fa-${estadoIcono}"></i> ${estadoTexto}</span></td>
+                </tr>
+            `}).join('');
         }
 
         function limpiarFiltrosPedidos() {
@@ -2339,7 +2539,11 @@
             document.getElementById('filtroFechaHasta').value = '';
             document.getElementById('filtroMedico').value = '';
             document.getElementById('buscarPedido').value = '';
+            todosPedidosFiltrados = [];
             renderCalendario();
+            if (diaSeleccionado) {
+                mostrarPedidosDelDia(diaSeleccionado);
+            }
         }
 
         // ===== INICIAR =====
