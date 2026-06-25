@@ -922,7 +922,8 @@ async function cargarResultadosDesdeSupabase() {
             analisis: r.examenes,
             muestras: 'No especificado',
             estado: r.estado,
-            empresa: 'Laboratorio San Jose'
+            empresa: 'Laboratorio San Jose',
+            pdf_url: r.pdf_url || null
         }));
 
         // Actualizar stats
@@ -1026,7 +1027,9 @@ async function cargarResultados() {
                 <td>
                     <div class="action-btns">
                         ${o.estado === 'listo' 
-                            ? `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}')"><i class="fas fa-download"></i> Descargar</a>`
+                            ? (o.pdf_url 
+                                ? `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}', '${o.pdf_url}')"><i class="fas fa-download"></i> Descargar</a>`
+                                : `<span style="color:var(--warning);font-size:13px;font-weight:600;"><i class="fas fa-clock"></i> PDF pendiente</span>`)
                             : o.estado === 'anulado'
                                 ? `<span style="color:var(--danger);font-size:13px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`
                                 : `<span style="color:var(--text-gray);font-size:13px;">-</span>`
@@ -1038,34 +1041,18 @@ async function cargarResultados() {
     }).join('');
 }
 
-async function descargarPDF(orden) {
+async function descargarPDF(orden, pdfUrl) {
     try {
-        // Construir el nombre del archivo esperado
-        const fileName = orden + '.pdf';
-
-        // Obtener URL pública del bucket resultados-pdf
-        const { data } = supabaseClient
-            .storage
-            .from('resultados-pdf')
-            .getPublicUrl(fileName);
-
-        if (!data || !data.publicUrl) {
-            showAlert('error', 'No se pudo obtener el PDF de la orden ' + orden);
-            return;
-        }
-
-        // Verificar si el archivo existe haciendo un HEAD request
-        const response = await fetch(data.publicUrl, { method: 'HEAD' });
-
-        if (!response.ok) {
+        if (!pdfUrl) {
             showAlert('info', 'PDF no disponible aun para la orden ' + orden);
             return;
         }
 
-        // Descargar el archivo
+        // Descargar el archivo directamente desde la URL guardada
         const a = document.createElement('a');
-        a.href = data.publicUrl + '?download=' + fileName;
+        a.href = pdfUrl + '?download=Resultado_' + orden + '.pdf';
         a.download = 'Resultado_' + orden + '.pdf';
+        a.target = '_blank';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1182,7 +1169,9 @@ function actualizarOrdenesIngresadas() {
         } else if (o.estado === 'anulado') {
             accionHtml = `<span style="color:var(--danger);font-size:12px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`;
         } else {
-            accionHtml = `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}')"><i class="fas fa-download"></i> Descargar</a>`;
+            accionHtml = (o.pdf_url 
+                ? `<a href="#" class="btn-descargar" onclick="descargarPDF('${o.numero_orden}', '${o.pdf_url}')"><i class="fas fa-download"></i> Descargar</a>`
+                : `<span style="color:var(--warning);font-size:12px;font-weight:600;"><i class="fas fa-clock"></i> PDF pendiente</span>`);
         }
         return `
             <tr>
