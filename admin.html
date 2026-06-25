@@ -824,38 +824,151 @@
         .cal-pedidos-count.hidden { display: none; }
 
         /* ===== FILTROS PEDIDOS ===== */
-        .filtros-pedidos {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        .filtros-row-top {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        .filtros-row-bottom {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filtro-item {
+            flex: 1;
+            min-width: 140px;
+            max-width: 200px;
+        }
+        .filtro-item.flex-grow {
+            flex: 2;
+            min-width: 250px;
+            max-width: none;
+        }
+        .filtro-item select, .filtro-item input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.3s;
+            background: white;
+            height: 36px;
+        }
+        .filtro-item select:focus, .filtro-item input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
+        }
+        .filtro-fecha-group {
+            display: flex;
+            align-items: center;
             gap: 8px;
-            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            background: white;
+            height: 36px;
         }
-        .filtro-group { display: flex; flex-direction: column; gap: 6px; }
-        .filtro-group label { font-size: 12px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
-        .filtro-group select, .filtro-group input {
-            padding: 10px 12px; border: 2px solid var(--border);
-            border-radius: 10px; font-family: 'Poppins', sans-serif;
-            font-size: 13px; color: var(--text-dark); outline: none;
-            transition: all 0.3s; background: white;
+        .fecha-label {
+            font-size: 12px;
+            color: var(--text-gray);
+            white-space: nowrap;
         }
-        .filtro-group select:focus, .filtro-group input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
-        .filtros-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+        .fecha-inputs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .fecha-inputs input {
+            border: none;
+            outline: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            color: var(--text-dark);
+            width: 110px;
+            padding: 0;
+            background: transparent;
+        }
+        .fecha-sep {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+        .filtro-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-left: auto;
+        }
         .btn-buscar-filtros {
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
-            color: white; border: none; border-radius: 10px;
-            padding: 10px 24px; font-family: 'Poppins', sans-serif;
-            font-size: 13px; font-weight: 600; cursor: pointer;
-            transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
         }
-        .btn-buscar-filtros:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3); }
+        .btn-buscar-filtros:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
         .btn-limpiar-filtros {
-            background: var(--bg-light); color: var(--text-gray);
-            border: 2px solid var(--border); border-radius: 10px;
-            padding: 10px 20px; font-family: 'Poppins', sans-serif;
-            font-size: 13px; font-weight: 600; cursor: pointer;
-            transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;
+            background: white;
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
         }
-        .btn-limpiar-filtros:hover { border-color: var(--danger); color: var(--danger); }
+        .btn-limpiar-filtros:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: #fee2e2;
+        }
+        .btn-filtros-adicionales {
+            background: white;
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+        }
+        .btn-filtros-adicionales:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        .btn-filtros-adicionales i {
+            color: var(--primary-blue);
+        }
 
         /* ===== TABLA PEDIDOS DÍA ===== */
         .pedidos-dia-header {
@@ -1110,74 +1223,72 @@
             <!-- ===== PEDIDOS TAB ===== -->
             <div id="pedidos" class="tab-content">
                 <!-- FILTROS -->
-                <div class="section-card">
-                    <div class="filtros-pedidos">
-                        <div class="filtro-group">
-                            <label>Cliente (Empresa)</label>
+                <div class="section-card" style="padding: 20px;">
+                    <div class="filtros-row-top">
+                        <div class="filtro-item">
                             <select id="filtroCliente">
-                                <option value="">Todos los clientes</option>
+                                <option value="">Cliente</option>
                             </select>
                         </div>
-                        <div class="filtro-group">
-                            <label>Categoria</label>
+                        <div class="filtro-item">
                             <select id="filtroCategoria">
-                                <option value="">Todas</option>
+                                <option value="">Categoría</option>
                                 <option value="convenio">Convenio</option>
                                 <option value="normal">Normal</option>
                                 <option value="emergencia">Emergencia</option>
                             </select>
                         </div>
-                        <div class="filtro-group">
-                            <label>Generado</label>
+                        <div class="filtro-item">
                             <select id="filtroGenerado">
-                                <option value="">Todos</option>
+                                <option value="">Generado</option>
                                 <option value="web">Web</option>
                                 <option value="presencial">Presencial</option>
                             </select>
                         </div>
-                        <div class="filtro-group">
-                            <label>Tipos atencion</label>
+                        <div class="filtro-item">
                             <select id="filtroTipoAtencion">
-                                <option value="">Todos</option>
+                                <option value="">Tipos atención</option>
                                 <option value="convenio">Convenio</option>
                                 <option value="particular">Particular</option>
                             </select>
                         </div>
-                        <div class="filtro-group">
-                            <label>Servicios</label>
+                        <div class="filtro-item">
                             <select id="filtroServicios">
-                                <option value="">Todos</option>
+                                <option value="">Servicios</option>
                                 <option value="laboratorio">Laboratorio</option>
                                 <option value="imagen">Imagen</option>
                                 <option value="consulta">Consulta</option>
                             </select>
                         </div>
-                        <div class="filtro-group">
-                            <label>Fecha creacion (desde)</label>
-                            <input type="date" id="filtroFechaDesde">
+                    </div>
+                    <div class="filtros-row-bottom">
+                        <div class="filtro-fecha-group">
+                            <span class="fecha-label">Fecha creación</span>
+                            <div class="fecha-inputs">
+                                <input type="date" id="filtroFechaDesde" placeholder="aaaa-mm-dd">
+                                <span class="fecha-sep">a</span>
+                                <input type="date" id="filtroFechaHasta" placeholder="aaaa-mm-dd">
+                            </div>
                         </div>
-                        <div class="filtro-group">
-                            <label>Fecha creacion (hasta)</label>
-                            <input type="date" id="filtroFechaHasta">
-                        </div>
-                        <div class="filtro-group">
-                            <label>Medico</label>
+                        <div class="filtro-item">
                             <select id="filtroMedico">
-                                <option value="">Todos</option>
+                                <option value="">Médico</option>
                             </select>
                         </div>
-                        <div class="filtro-group" style="min-width:250px; flex:2;">
-                            <label>Buscar</label>
-                            <input type="text" id="buscarPedido" placeholder="Numero de pedido, identificacion, nombres o apellidos...">
+                        <div class="filtro-item flex-grow">
+                            <input type="text" id="buscarPedido" placeholder="Buscar por número de pedido, identificación, nombres o apellidos...">
                         </div>
-                    </div>
-                    <div class="filtros-row" style="margin-top:12px;">
-                        <button class="btn-buscar-filtros" onclick="aplicarFiltrosPedidos()">
-                            <i class="fas fa-search"></i> Buscar
-                        </button>
-                        <button class="btn-limpiar-filtros" onclick="limpiarFiltrosPedidos()">
-                            <i class="fas fa-times"></i> Limpiar filtros
-                        </button>
+                        <div class="filtro-actions">
+                            <button class="btn-filtros-adicionales" onclick="toggleFiltrosAdicionales()">
+                                <i class="fas fa-filter"></i> Filtros adicionales
+                            </button>
+                            <button class="btn-limpiar-filtros" onclick="limpiarFiltrosPedidos()">
+                                <i class="fas fa-times"></i> Limpiar filtros
+                            </button>
+                            <button class="btn-buscar-filtros" onclick="aplicarFiltrosPedidos()">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
