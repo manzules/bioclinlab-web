@@ -39,7 +39,7 @@
             width: 60px;
             background: linear-gradient(180deg, var(--dark-blue), #083344);
             color: white;
-            padding: 16px 0;
+            padding: 0;
             z-index: 100;
             overflow-y: auto;
             overflow-x: hidden;
@@ -51,25 +51,32 @@
             width: 260px;
         }
         .sidebar-logo {
-            padding: 0 16px 20px;
+            padding: 20px 16px 16px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             opacity: 0;
             transition: opacity 0.3s ease;
             white-space: nowrap;
             overflow: hidden;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .sidebar:hover .sidebar-logo {
             opacity: 1;
+            justify-content: flex-start;
         }
         .sidebar-logo img {
             max-width: 180px;
             height: auto;
+            filter: brightness(0) invert(1);
         }
         .sidebar-menu {
             list-style: none;
             padding: 0 8px;
             flex: 1;
+            margin: 0;
         }
         .sidebar-menu li {
             margin-bottom: 4px;
@@ -93,6 +100,7 @@
             text-align: left;
             white-space: nowrap;
             overflow: hidden;
+            height: 44px;
         }
         .sidebar-menu a:hover,
         .sidebar-menu button:hover,
@@ -107,6 +115,7 @@
         }
         .sidebar-menu i {
             width: 24px;
+            min-width: 24px;
             text-align: center;
             font-size: 18px;
             flex-shrink: 0;
@@ -118,6 +127,7 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             white-space: nowrap;
+            overflow: hidden;
         }
         .sidebar:hover .sidebar-menu span {
             opacity: 1;
@@ -129,6 +139,7 @@
             transition: opacity 0.3s ease;
             white-space: nowrap;
             overflow: hidden;
+            margin-top: auto;
         }
         .sidebar:hover .sidebar-footer {
             opacity: 1;
@@ -2103,25 +2114,26 @@
                 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             titulo.textContent = nombresMeses[mes] + ' ' + año;
 
-            const primerDia = new Date(año, mes, 1).getDay();
+            const primerDiaSemana = new Date(año, mes, 1).getDay(); // 0=Domingo, 1=Lunes...
             const diasEnMes = new Date(año, mes + 1, 0).getDate();
-            const diasMesAnterior = new Date(año, mes, 0).getDate();
 
             const diasSemana = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
             let html = '';
 
-            // Headers
+            // Headers de días de la semana
             diasSemana.forEach(d => {
                 html += `<div class="cal-dia-header">${d}</div>`;
             });
 
-            // Días del mes anterior
-            const inicio = primerDia === 0 ? 6 : primerDia - 1;
-            for (let i = inicio - 1; i >= 0; i--) {
-                html += `<div class="cal-dia otro-mes"><span class="cal-numero">${diasMesAnterior - i}</span></div>`;
+            // Espacios vacíos antes del día 1 (para alinear correctamente)
+            // Ajustar para que lunes sea el primer día (estilo europeo)
+            let espaciosInicio = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1;
+
+            for (let i = 0; i < espaciosInicio; i++) {
+                html += `<div class="cal-dia" style="visibility:hidden;"></div>`;
             }
 
-            // Días del mes actual
+            // Días del mes actual (SOLO estos, sin días de otros meses)
             const hoy = new Date();
             for (let dia = 1; dia <= diasEnMes; dia++) {
                 const fechaStr = `${año}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
@@ -2138,13 +2150,6 @@
                     <span class="cal-numero">${dia}</span>
                     ${count > 0 ? `<span class="cal-pedidos-count">${count}</span>` : ''}
                 </div>`;
-            }
-
-            // Días del mes siguiente
-            const totalCeldas = inicio + diasEnMes;
-            const siguiente = 42 - totalCeldas;
-            for (let dia = 1; dia <= siguiente; dia++) {
-                html += `<div class="cal-dia otro-mes"><span class="cal-numero">${dia}</span></div>`;
             }
 
             grid.innerHTML = html;
