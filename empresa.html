@@ -797,7 +797,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let ordenesData = [];
-let ordenesIngresadas = [];
 
 function showTab(tabId, linkEl) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -839,6 +838,60 @@ function showAlert(type, message) {
     textEl.textContent = message;
     alertEl.classList.remove('alert-hidden');
     setTimeout(() => alertEl.classList.add('alert-hidden'), 4000);
+}
+
+// ===== CARGAR RESULTADOS DESDE SUPABASE =====
+async function cargarResultadosDesdeSupabase() {
+    try {
+        const { data: resultados, error } = await supabaseClient
+            .from('resultados')
+            .select('*, pacientes(nombre, cedula)')
+            .order('fecha_examen', { ascending: false })
+            .order('numero_orden', { ascending: false });
+
+        if (error) {
+            console.error('Error cargando resultados:', error);
+            showAlert('error', 'Error al cargar resultados');
+            return;
+        }
+
+        // Convertir al formato que usa la tabla de empresa
+        ordenesData = (resultados || []).map(r => ({
+            numero_orden: r.numero_orden,
+            paciente_nombre: r.pacientes?.nombre || 'N/A',
+            paciente_cedula: r.pacientes?.cedula || '',
+            fecha: r.fecha_examen,
+            hora: r.fecha_subida ? new Date(r.fecha_subida).toTimeString().slice(0,5) : '',
+            medico: 'Dr. .',
+            analisis: r.examenes,
+            muestras: 'No especificado',
+            estado: r.estado,
+            empresa: 'Laboratorio San Jose'
+        }));
+
+        // Actualizar stats
+        const total = ordenesData.length;
+        const listos = ordenesData.filter(o => o.estado === 'listo').length;
+        const proceso = ordenesData.filter(o => o.estado === 'proceso').length;
+        const hoy = new Date();
+        const semanaInicio = new Date(hoy); semanaInicio.setDate(hoy.getDate() - 7);
+        const estaSemana = ordenesData.filter(o => new Date(o.fecha) >= semanaInicio).length;
+
+        document.getElementById('statTotal').textContent = total;
+        document.getElementById('statListos').textContent = listos;
+        document.getElementById('statProceso').textContent = proceso;
+        document.getElementById('statSemana').textContent = estaSemana;
+
+        // Actualizar tabla principal
+        cargarResultados();
+
+        // Actualizar tabla de ordenes ingresadas recientemente
+        actualizarOrdenesIngresadas();
+
+    } catch (err) {
+        console.error('Error:', err);
+        showAlert('error', 'Error de conexión');
+    }
 }
 
 async function cargarResultados() {
@@ -940,7 +993,7 @@ function ordenarResultados() {
     cargarResultados();
 }
 
-function registrarOrden(e) {
+async function registrarOrden(e) {
     e.preventDefault();
     const cedula = document.getElementById('ordCedula').value.trim();
     const nombre = document.getElementById('ordNombre').value.trim();
@@ -948,36 +1001,81 @@ function registrarOrden(e) {
     const examenes = document.getElementById('ordExamenes').value.trim();
     const muestras = document.getElementById('ordMuestras').value.trim() || 'No especificado';
 
-    const nuevaOrden = {
-        numero_orden: String(1850000 + Math.floor(Math.random() * 99999)),
-        paciente_nombre: nombre.toUpperCase(),
-        paciente_cedula: cedula,
-        fecha: fecha,
-        hora: new Date().toTimeString().slice(0,5),
-        medico: document.getElementById('ordMedico').value.trim() || 'Dr. .',
-        analisis: examenes.toUpperCase(),
-        muestras: muestras.toUpperCase(),
-        estado: 'proceso',
-        empresa: 'Laboratorio San Jose'
-    };
+    const numeroOrden = String(1850000 + Math.floor(Math.random() * 99999));
 
-    ordenesData.unshift(nuevaOrden);
-    ordenesIngresadas.unshift(nuevaOrden);
+    // Primero buscar o crear el paciente en Supabase
+    try {
+        // Buscar si el paciente ya existe
+        let { data: pacienteExistente } = await supabaseClient
+            .from('pacientes')
+            .select('id')
+            .eq('cedula', cedula)
+            .single();
 
-    showAlert('success', 'Orden ' + nuevaOrden.numero_orden + ' registrada correctamente');
-    document.getElementById('formOrden').reset();
-    document.getElementById('ordFecha').value = new Date().toISOString().split('T')[0];
+        let pacienteId;
 
-    actualizarOrdenesIngresadas();
+        if (pacienteExistente) {
+            pacienteId = pacienteExistente.id;
+        } else {
+            // Crear paciente nuevo
+            const { data: nuevoPaciente, error: errPac } = await supabaseClient
+                .from('pacientes')
+                .insert([{
+                    cedula: cedula,
+                    nombre: nombre.toUpperCase(),
+                    telefono: document.getElementById('ordTelefono').value.trim() || null,
+                    email: document.getElementById('ordEmail').value.trim() || null
+                }])
+                .select()
+                .single();
+
+            if (errPac) {
+                showAlert('error', 'Error al crear paciente: ' + errPac.message);
+                return;
+            }
+            pacienteId = nuevoPaciente.id;
+        }
+
+        // Insertar resultado en Supabase
+        const { data: resultado, error: errRes } = await supabaseClient
+            .from('resultados')
+            .insert([{
+                paciente_id: pacienteId,
+                numero_orden: numeroOrden,
+                fecha_examen: fecha,
+                examenes: examenes.toUpperCase(),
+                estado: 'proceso'
+            }])
+            .select()
+            .single();
+
+        if (errRes) {
+            showAlert('error', 'Error al guardar orden: ' + errRes.message);
+            return;
+        }
+
+        showAlert('success', 'Orden ' + numeroOrden + ' registrada correctamente');
+        document.getElementById('formOrden').reset();
+        document.getElementById('ordFecha').value = new Date().toISOString().split('T')[0];
+
+        // Recargar resultados desde Supabase
+        await cargarResultadosDesdeSupabase();
+
+    } catch (err) {
+        showAlert('error', 'Error de conexión: ' + err.message);
+        console.error(err);
+    }
 }
 
 function actualizarOrdenesIngresadas() {
     const tbody = document.getElementById('tbodyOrdenesIngresadas');
-    if (ordenesIngresadas.length === 0) {
+    if (ordenesData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:40px;">No hay ordenes registradas aun</td></tr>';
         return;
     }
-    tbody.innerHTML = ordenesIngresadas.map(o => {
+    // Mostrar solo las últimas 10 ordenes
+    const ultimas = ordenesData.slice(0, 10);
+    tbody.innerHTML = ultimas.map(o => {
         const fechaStr = new Date(o.fecha).toLocaleDateString('es-ES') + ' ' + (o.hora || '');
         return `
             <tr>
@@ -1022,7 +1120,7 @@ if (empresaParam) {
 }
 
 // Load results on page load
-cargarResultados();
+cargarResultadosDesdeSupabase();
 </script>
 
 </body>
