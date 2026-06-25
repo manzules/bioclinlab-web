@@ -408,6 +408,8 @@
             font-family: 'Poppins', sans-serif; background: var(--danger); color: white;
         }
         .btn-anular:hover { background: #dc2626; transform: translateY(-1px); }
+        .estado-pedido-solicitado { background: #dbeafe; color: #1e40af; }
+        .estado-pedido-descargado { background: #dcfce7; color: #166534; }
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.5);
             display: none; align-items: center; justify-content: center; z-index: 200;
@@ -455,6 +457,7 @@
     </div>
     <ul class="sidebar-menu">
         <li><button class="active" onclick="showTab('resultados', this)"><i class="fas fa-file-medical-alt"></i> Resultados</button></li>
+        <li><button onclick="showTab('pedidos', this)"><i class="fas fa-clipboard-list"></i> Pedidos</button></li>
         <li><button onclick="showTab('ingresar', this)"><i class="fas fa-plus-circle"></i> Ingresar Orden</button></li>
         <li><button onclick="showTab('catalogo', this)"><i class="fas fa-list-alt"></i> Catalogo</button></li>
     </ul>
@@ -612,7 +615,47 @@
             </div>
         </div>
 
-        <!-- INGRESAR ORDEN TAB -->
+        
+        <!-- PEDIDOS TAB -->
+        <div id="pedidos" class="tab-content">
+            <div class="section-card">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Mis pedidos</h2>
+                        <p class="section-subtitle" id="subtituloPedidos">Cargando...</p>
+                    </div>
+                </div>
+
+                <div class="loading-state" id="loadingPedidos">
+                    <div class="loading-spinner"></div>
+                    <p class="empty-subtext">Cargando pedidos...</p>
+                </div>
+
+                <div class="empty-state" id="emptyPedidos" style="display:none;">
+                    <div class="empty-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <p class="empty-text">NO HAY PEDIDOS REGISTRADOS</p>
+                    <p class="empty-subtext">Cuando registres ordenes, apareceran aqui.</p>
+                </div>
+
+                <div id="tablaPedidosContainer" style="display:none; overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Orden</th>
+                                <th>Fecha creacion</th>
+                                <th>Servicio / Tipo atencion</th>
+                                <th>Cliente</th>
+                                <th>Paciente</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPedidos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+<!-- INGRESAR ORDEN TAB -->
         <div id="ingresar" class="tab-content">
             <div class="section-card">
                 <div class="section-header">
@@ -862,6 +905,7 @@ function showTab(tabId, linkEl) {
 
     const titles = {
         resultados: { title: 'Resultados', breadcrumb: 'Portal de Empresas / Resultados' },
+        pedidos: { title: 'Pedidos', breadcrumb: 'Portal de Empresas / Pedidos' },
         ingresar: { title: 'Ingresar Orden', breadcrumb: 'Portal de Empresas / Ingresar Orden' },
         catalogo: { title: 'Catalogo', breadcrumb: 'Portal de Empresas / Catalogo' }
     };
@@ -869,6 +913,7 @@ function showTab(tabId, linkEl) {
     document.getElementById('pageBreadcrumb').textContent = titles[tabId].breadcrumb;
 
     if (tabId === 'resultados') cargarResultados();
+    if (tabId === 'pedidos') cargarPedidos();
     if (tabId === 'ingresar') {
         document.getElementById('ordFecha').value = new Date().toISOString().split('T')[0];
     }
@@ -1255,6 +1300,67 @@ document.getElementById('modalAnular').addEventListener('click', function(e) {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') cerrarModalAnular();
 });
+
+
+// ===== CARGAR PEDIDOS =====
+async function cargarPedidos() {
+    const loading = document.getElementById('loadingPedidos');
+    const empty = document.getElementById('emptyPedidos');
+    const container = document.getElementById('tablaPedidosContainer');
+    const tbody = document.getElementById('tbodyPedidos');
+    const subtitulo = document.getElementById('subtituloPedidos');
+
+    loading.style.display = 'block';
+    empty.style.display = 'none';
+    container.style.display = 'none';
+
+    await new Promise(r => setTimeout(r, 400));
+
+    loading.style.display = 'none';
+
+    if (ordenesData.length === 0) {
+        empty.style.display = 'block';
+        subtitulo.textContent = '0 pedido(s) encontrados';
+        return;
+    }
+
+    const total = ordenesData.length;
+    subtitulo.textContent = total + ' pedido(s) encontrados';
+
+    container.style.display = 'block';
+    tbody.innerHTML = ordenesData.map(o => {
+        const fechaCreacion = new Date(o.fecha).toLocaleDateString('es-ES');
+        const horaCreacion = o.hora || '';
+        const fechaCompleta = fechaCreacion + (horaCreacion ? ' ' + horaCreacion : '');
+
+        // Determinar estado visual: solicitado (azul) o descargado (verde)
+        // Por ahora todo es SOLICITADO hasta que Mario diga lo contrario
+        const estadoVisual = 'solicitado';
+        const estadoTexto = 'SOLICITADO';
+        const estadoIcono = 'clock';
+
+        return `
+            <tr>
+                <td><span class="orden-numero">${o.numero_orden}</span></td>
+                <td>${fechaCompleta}</td>
+                <td><span class="analisis-tag">${o.analisis}</span></td>
+                <td><strong>${o.empresa || 'Empresa'}</strong></td>
+                <td>
+                    <div class="paciente-nombre">
+                        ${o.paciente_nombre}
+                        <small>Cedula: ${o.paciente_cedula}</small>
+                    </div>
+                </td>
+                <td>
+                    <span class="estado-badge estado-pedido-${estadoVisual}">
+                        <i class="fas fa-${estadoIcono}"></i>
+                        ${estadoTexto}
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
 
 function toggleCatalogo(card) {
     const list = card.querySelector('.catalogo-pruebas-list');
