@@ -981,6 +981,7 @@
 
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1013,12 +1014,12 @@
                 <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
                 <h1 class="topbar-title" id="pageTitle">Dashboard</h1>
             </div>
-            <div class="topbar-user">
+            <div class="topbar-user" style="cursor:pointer;" onclick="cerrarSesionAdmin()">
                 <div>
                     <div class="topbar-name">Administrador</div>
                     <div class="topbar-role">BIOCLINLAB</div>
                 </div>
-                <div class="topbar-avatar">
+                <div class="topbar-avatar" style="background:linear-gradient(135deg,var(--success),#16a34a);">
                     <i class="fas fa-user-shield"></i>
                 </div>
             </div>
@@ -1392,12 +1393,43 @@
 
             <!-- ===== CONFIG TAB ===== -->
             <div id="config" class="tab-content">
+                <!-- GESTIÓN DE ADMINISTRADORES -->
                 <div class="section-card">
                     <div class="section-header">
-                        <h2 class="section-title">Configuración del sistema</h2>
+                        <div>
+                            <h2 class="section-title"><i class="fas fa-user-shield" style="color:var(--primary-blue);margin-right:10px;"></i>Gestión de Administradores</h2>
+                            <p class="section-subtitle" style="font-size:13px;color:var(--text-gray);margin-top:4px;">Crear, editar y gestionar cuentas de administrador</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="abrirModal('modalNuevoAdmin')">
+                            <i class="fas fa-plus"></i> Nuevo Admin
+                        </button>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Creado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAdmins">
+                                <tr><td colspan="6" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Cargando admins...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- CONFIGURACIÓN GENERAL (placeholder) -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-cog" style="color:var(--text-gray);margin-right:10px;"></i>Configuración del Sistema</h2>
                     </div>
                     <p style="color:var(--text-gray);text-align:center;padding:40px;">
-                        <i class="fas fa-cog" style="font-size:48px;display:block;margin-bottom:16px;opacity:0.3;"></i>
+                        <i class="fas fa-tools" style="font-size:48px;display:block;margin-bottom:16px;opacity:0.3;"></i>
                         Configuración avanzada en desarrollo.
                     </p>
                 </div>
@@ -1477,6 +1509,88 @@
                     <button type="button" class="btn btn-outline" onclick="cerrarModal('modalSubirPDF')">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="btnSubirPDF">
                         <i class="fas fa-upload"></i> Subir PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL NUEVO ADMIN ===== -->
+    <div class="modal-overlay" id="modalNuevoAdmin">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user-plus" style="color:var(--primary-blue);margin-right:8px;"></i>Crear Nuevo Administrador</h3>
+                <button class="modal-close" onclick="cerrarModal('modalNuevoAdmin')"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formNuevoAdmin" onsubmit="guardarAdmin(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="newAdminNombre">Nombre completo *</label>
+                        <input type="text" id="newAdminNombre" placeholder="Ej: Juan Pérez" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newAdminEmail">Email *</label>
+                        <input type="email" id="newAdminEmail" placeholder="Ej: admin@bioclinlab.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newAdminPassword">Contraseña *</label>
+                        <input type="password" id="newAdminPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="newAdminRol">Rol</label>
+                        <select id="newAdminRol">
+                            <option value="admin">Administrador</option>
+                            <option value="superadmin">Super Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="cerrarModal('modalNuevoAdmin')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardarAdmin">
+                        <i class="fas fa-save"></i> Crear Admin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL EDITAR ADMIN ===== -->
+    <div class="modal-overlay" id="modalEditarAdmin">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user-edit" style="color:var(--primary-blue);margin-right:8px;"></i>Editar Administrador</h3>
+                <button class="modal-close" onclick="cerrarModal('modalEditarAdmin')"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formEditarAdmin" onsubmit="actualizarAdmin(event)">
+                <input type="hidden" id="editAdminId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editAdminNombre">Nombre completo *</label>
+                        <input type="text" id="editAdminNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAdminEmail">Email *</label>
+                        <input type="email" id="editAdminEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAdminRol">Rol</label>
+                        <select id="editAdminRol">
+                            <option value="admin">Administrador</option>
+                            <option value="superadmin">Super Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAdminActivo">Estado</label>
+                        <select id="editAdminActivo">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="cerrarModal('modalEditarAdmin')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnActualizarAdmin">
+                        <i class="fas fa-save"></i> Guardar cambios
                     </button>
                 </div>
             </form>
@@ -2881,10 +2995,218 @@
             }
         }
 
+        // ===== PROTECCIÓN DE SESIÓN ADMIN =====
+        function verificarSesionAdmin() {
+            const sesion = localStorage.getItem('bioclinlab_admin_sesion');
+            if (!sesion) {
+                window.location.href = 'clientes.html';
+                return false;
+            }
+            const s = JSON.parse(sesion);
+            const horas = (new Date() - new Date(s.fecha)) / 3600000;
+            if (horas > 8) {
+                localStorage.removeItem('bioclinlab_admin_sesion');
+                window.location.href = 'clientes.html';
+                return false;
+            }
+            // Mostrar nombre del admin en el topbar
+            document.querySelector('.topbar-name').textContent = s.nombre || 'Administrador';
+            document.querySelector('.topbar-role').textContent = 'Admin - ' + (s.rol || 'admin');
+            return true;
+        }
+
+        function cerrarSesionAdmin() {
+            if (!confirm('¿Cerrar sesión de administrador?')) return;
+            localStorage.removeItem('bioclinlab_admin_sesion');
+            window.location.href = 'clientes.html';
+        }
+
         // ===== INICIAR =====
         document.addEventListener('DOMContentLoaded', () => {
+            if (!verificarSesionAdmin()) return;
             cargarDashboard();
         });
+
+        // ===== GESTIÓN DE ADMINS =====
+        let todosAdmins = [];
+
+        async function cargarAdmins() {
+            try {
+                const { data: admins, error } = await supabaseClient
+                    .from('admins')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error cargando admins:', error);
+                    return;
+                }
+
+                todosAdmins = admins || [];
+                renderAdmins(todosAdmins);
+
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }
+
+        function renderAdmins(admins) {
+            const tbody = document.getElementById('tablaAdmins');
+            if (!admins || admins.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-users-slash" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.3;"></i>No hay administradores registrados</td></tr>';
+                return;
+            }
+
+            const sesion = JSON.parse(localStorage.getItem('bioclinlab_admin_sesion') || '{}');
+            const miEmail = sesion.email;
+
+            tbody.innerHTML = admins.map(a => {
+                const estadoClass = a.activo ? 'estado-listo' : 'estado-proceso';
+                const estadoTexto = a.activo ? 'ACTIVO' : 'INACTIVO';
+                const esYo = a.email === miEmail;
+                return `
+                <tr>
+                    <td><strong>${a.nombre}</strong>${esYo ? ' <span style="color:var(--primary-blue);font-size:11px;">(Tú)</span>' : ''}</td>
+                    <td>${a.email}</td>
+                    <td><span class="estado-badge" style="background:var(--light-blue);color:var(--primary-blue);">${a.rol || 'admin'}</span></td>
+                    <td><span class="estado-badge ${estadoClass}">${estadoTexto}</span></td>
+                    <td>${new Date(a.created_at).toLocaleDateString('es-ES')}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn edit" title="Editar" onclick="abrirEditarAdmin('${a.id}', '${a.nombre}', '${a.email}', '${a.rol || 'admin'}', ${a.activo})"><i class="fas fa-edit"></i></button>
+                            ${!esYo ? `<button class="action-btn delete" title="Eliminar" onclick="eliminarAdmin('${a.id}', '${a.nombre}')"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        async function guardarAdmin(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('newAdminNombre').value.trim();
+            const email = document.getElementById('newAdminEmail').value.trim();
+            const password = document.getElementById('newAdminPassword').value;
+            const rol = document.getElementById('newAdminRol').value;
+
+            if (!nombre || !email || !password) {
+                showAlert('error', 'Nombre, email y contraseña son obligatorios');
+                return;
+            }
+            if (password.length < 6) {
+                showAlert('error', 'La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            setLoading('btnGuardarAdmin', true);
+
+            try {
+                // Verificar si el email ya existe
+                const { data: existente } = await supabaseClient
+                    .from('admins')
+                    .select('id')
+                    .eq('email', email)
+                    .limit(1);
+
+                if (existente && existente.length > 0) {
+                    showAlert('error', 'Ya existe un admin con ese email');
+                    setLoading('btnGuardarAdmin', false);
+                    return;
+                }
+
+                const { error } = await supabaseClient
+                    .from('admins')
+                    .insert([{ nombre, email, password, rol, activo: true }]);
+
+                if (error) {
+                    showAlert('error', 'Error: ' + error.message);
+                    setLoading('btnGuardarAdmin', false);
+                    return;
+                }
+
+                showAlert('success', 'Administrador creado correctamente');
+                cerrarModal('modalNuevoAdmin');
+                document.getElementById('formNuevoAdmin').reset();
+                cargarAdmins();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+                console.error(err);
+            } finally {
+                setLoading('btnGuardarAdmin', false);
+            }
+        }
+
+        function abrirEditarAdmin(id, nombre, email, rol, activo) {
+            document.getElementById('editAdminId').value = id;
+            document.getElementById('editAdminNombre').value = nombre;
+            document.getElementById('editAdminEmail').value = email;
+            document.getElementById('editAdminRol').value = rol;
+            document.getElementById('editAdminActivo').value = String(activo);
+            abrirModal('modalEditarAdmin');
+        }
+
+        async function actualizarAdmin(e) {
+            e.preventDefault();
+            const id = document.getElementById('editAdminId').value;
+            const nombre = document.getElementById('editAdminNombre').value.trim();
+            const email = document.getElementById('editAdminEmail').value.trim();
+            const rol = document.getElementById('editAdminRol').value;
+            const activo = document.getElementById('editAdminActivo').value === 'true';
+
+            setLoading('btnActualizarAdmin', true);
+
+            try {
+                const { error } = await supabaseClient
+                    .from('admins')
+                    .update({ nombre, email, rol, activo })
+                    .eq('id', id);
+
+                if (error) {
+                    showAlert('error', 'Error al actualizar: ' + error.message);
+                    setLoading('btnActualizarAdmin', false);
+                    return;
+                }
+
+                showAlert('success', 'Administrador actualizado correctamente');
+                cerrarModal('modalEditarAdmin');
+                cargarAdmins();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+                console.error(err);
+            } finally {
+                setLoading('btnActualizarAdmin', false);
+            }
+        }
+
+        async function eliminarAdmin(id, nombre) {
+            if (!confirm('¿Estás seguro de eliminar al administrador "' + nombre + '"?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('admins')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    showAlert('error', 'Error al eliminar: ' + error.message);
+                    return;
+                }
+
+                showAlert('success', 'Administrador eliminado');
+                cargarAdmins();
+
+            } catch (err) {
+                showAlert('error', 'Error de conexión');
+            }
+        }
+
+        // Modificar showTab para cargar admins cuando se abra config
+        const originalShowTab = showTab;
+        showTab = function(tabId, linkEl) {
+            originalShowTab(tabId, linkEl);
+            if (tabId === 'config') cargarAdmins();
+        };
     </script>
 
     <!-- ===== MODAL PREVISUALIZAR PDF ===== -->
