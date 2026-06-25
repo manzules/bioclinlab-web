@@ -602,7 +602,7 @@
                                 <th>Fecha</th>
                                 <th>Paciente / Examenes</th>
                                 <th>Estado</th>
-                                <th>Accion</th>
+                                <th>Resultados</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyResultados"></tbody>
@@ -1032,7 +1032,7 @@ async function cargarResultados() {
                                 : `<span style="color:var(--warning);font-size:13px;font-weight:600;"><i class="fas fa-clock"></i> PDF pendiente</span>`)
                             : o.estado === 'anulado'
                                 ? `<span style="color:var(--danger);font-size:13px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`
-                                : `<button class="btn-descargar" disabled style="background:#94a3b8;cursor:not-allowed;box-shadow:none;transform:none;"><i class="fas fa-download"></i> Descargar</button>`
+                                : `<button class="btn-descargar" disabled style="background:#94a3b8;cursor:not-allowed;box-shadow:none;transform:none;"><i class="fas fa-clock"></i> PDF no disponible</button>`
                         }
                     </div>
                 </td>
