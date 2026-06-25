@@ -203,6 +203,7 @@
         }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div class="portal-container">
@@ -217,6 +218,7 @@
         <div class="user-type-grid">
             <button class="user-type-btn active" onclick="selectType('paciente', this)"><i class="fas fa-user"></i><span>PACIENTE</span></button>
             <button class="user-type-btn" onclick="selectType('empresa', this)"><i class="fas fa-building"></i><span>EMPRESA</span></button>
+            <button class="user-type-btn" onclick="selectType('admin', this)"><i class="fas fa-user-shield"></i><span>ADMIN</span></button>
         </div>
 
         <!-- LOGIN PACIENTE -->
@@ -265,6 +267,35 @@
                 <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</button>
                 <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
             </form>
+        </div>
+
+        <!-- LOGIN ADMIN -->
+        <div class="form-container" id="login-admin">
+            <h3 style="font-size:18px;font-weight:700;color:var(--text-dark);margin-bottom:20px;"><i class="fas fa-user-shield" style="color:var(--primary-blue);margin-right:8px;"></i>Acceso Administrador</h3>
+            <form onsubmit="handleLoginAdmin(event)">
+                <div class="form-group"><label for="admin-email">Email *</label><input type="email" id="admin-email" placeholder="admin@bioclinlab.com" required></div>
+                <div class="form-group">
+                    <label for="admin-password">Contraseña *</label>
+                    <div class="password-wrapper"><input type="password" id="admin-password" placeholder="Tu contraseña" required><button type="button" class="toggle-pass" onclick="togglePassword('admin-password', this)"><i class="fas fa-eye"></i></button></div>
+                </div>
+                <button type="submit" class="btn-login" id="btnLoginAdmin"><i class="fas fa-sign-in-alt"></i> Ingresar como Admin</button>
+            </form>
+            <div id="adminRegistroBox" style="display:none;margin-top:20px;padding:16px;background:var(--bg-light);border-radius:12px;border:2px dashed var(--border);">
+                <p style="font-size:13px;color:var(--text-gray);margin-bottom:12px;"><i class="fas fa-info-circle" style="color:var(--primary-blue);"></i> No existe ninguna cuenta de administrador. Crea la primera cuenta maestra:</p>
+                <form onsubmit="handleRegistroAdmin(event)">
+                    <div class="form-group"><label for="reg-admin-nombre">Nombre completo *</label><input type="text" id="reg-admin-nombre" placeholder="Ej: Mario Pérez" required></div>
+                    <div class="form-group"><label for="reg-admin-email">Email *</label><input type="email" id="reg-admin-email" placeholder="Ej: admin@bioclinlab.com" required></div>
+                    <div class="form-group">
+                        <label for="reg-admin-password">Contraseña *</label>
+                        <div class="password-wrapper"><input type="password" id="reg-admin-password" placeholder="Mínimo 6 caracteres" required minlength="6"><button type="button" class="toggle-pass" onclick="togglePassword('reg-admin-password', this)"><i class="fas fa-eye"></i></button></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-admin-password2">Confirmar contraseña *</label>
+                        <div class="password-wrapper"><input type="password" id="reg-admin-password2" placeholder="Repite tu contraseña" required minlength="6"><button type="button" class="toggle-pass" onclick="togglePassword('reg-admin-password2', this)"><i class="fas fa-eye"></i></button></div>
+                    </div>
+                    <button type="submit" class="btn-login" id="btnRegistroAdmin" style="background:linear-gradient(135deg,#22C55E,#16a34a);"><i class="fas fa-user-plus"></i> Crear cuenta Admin</button>
+                </form>
+            </div>
         </div>
 
         <div class="portal-footer">
@@ -330,7 +361,8 @@
             btn.classList.add('active');
             document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
             if (type === 'paciente') mostrarLogin();
-            else { document.getElementById('login-empresa').classList.add('active'); document.getElementById('register-link').style.display = 'block'; }
+            else if (type === 'empresa') { document.getElementById('login-empresa').classList.add('active'); document.getElementById('register-link').style.display = 'block'; }
+            else if (type === 'admin') { mostrarLoginAdmin(); }
         }
         function mostrarLogin() {
             document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
@@ -563,7 +595,166 @@
                 const horas = (new Date() - new Date(s.fecha)) / 3600000;
                 if (horas < 8 && s.tipo === 'paciente' && s.cedula) document.getElementById('login-cedula').value = s.cedula;
             }
+            // Verificar si ya existe admin para mostrar/ocultar registro
+            verificarAdminExistente();
         });
+
+        // ===== FUNCIONES ADMIN =====
+        async function verificarAdminExistente() {
+            try {
+                if (!supabaseClient) return;
+                const { data, error } = await supabaseClient
+                    .from('admins')
+                    .select('id')
+                    .limit(1);
+
+                const registroBox = document.getElementById('adminRegistroBox');
+                if (!data || data.length === 0) {
+                    // No hay admins, mostrar registro
+                    registroBox.style.display = 'block';
+                } else {
+                    // Ya hay admins, ocultar registro
+                    registroBox.style.display = 'none';
+                }
+            } catch(e) { console.log('Verificación admin:', e); }
+        }
+
+        function mostrarLoginAdmin() {
+            document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+            document.getElementById('login-admin').classList.add('active');
+            document.getElementById('register-link').style.display = 'none';
+        }
+
+        async function handleLoginAdmin(e) {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            const btn = document.getElementById('btnLoginAdmin');
+
+            if (!email || !password) {
+                mostrarModal('error','Campos incompletos','Ingresa tu email y contraseña.',null,null,'Entendido');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Verificando...';
+
+            try {
+                if (!supabaseClient) {
+                    mostrarModal('error','Error','Conexión con base de datos no disponible.',null,null,'Entendido');
+                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar como Admin';
+                    return;
+                }
+
+                const { data, error } = await supabaseClient
+                    .from('admins')
+                    .select('*')
+                    .eq('email', email)
+                    .eq('password', password)
+                    .eq('activo', true)
+                    .limit(1);
+
+                if (error) {
+                    mostrarModal('error','Error',error.message,null,null,'Entendido');
+                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar como Admin';
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    mostrarModal('error','Credenciales incorrectas','El email o la contraseña no son correctos, o la cuenta está desactivada.',null,null,'Intentar de nuevo');
+                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar como Admin';
+                    return;
+                }
+
+                const admin = data[0];
+                localStorage.setItem('bioclinlab_admin_sesion', JSON.stringify({
+                    id: admin.id,
+                    email: admin.email,
+                    nombre: admin.nombre,
+                    rol: admin.rol,
+                    fecha: new Date().toISOString(),
+                    token: btoa(admin.email + ':' + Date.now())
+                }));
+
+                mostrarModal('success', '¡Bienvenido Admin!', 
+                    'Hola ' + admin.nombre + ', has iniciado sesión como administrador.',
+                    {'Email': admin.email, 'Rol': admin.rol},
+                    function() { window.location.href = 'admin.html'; },
+                    'Continuar'
+                );
+
+            } catch(err) {
+                mostrarModal('error','Error de conexión',err.message || 'Error desconocido',null,null,'Entendido');
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar como Admin';
+            }
+        }
+
+        async function handleRegistroAdmin(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('reg-admin-nombre').value.trim();
+            const email = document.getElementById('reg-admin-email').value.trim();
+            const password = document.getElementById('reg-admin-password').value;
+            const password2 = document.getElementById('reg-admin-password2').value;
+            const btn = document.getElementById('btnRegistroAdmin');
+
+            if (!nombre || !email || !password) {
+                mostrarModal('error','Campos obligatorios','Nombre, email y contraseña son obligatorios.',null,null,'Entendido');
+                return;
+            }
+            if (password.length < 6) {
+                mostrarModal('error','Contraseña muy corta','La contraseña debe tener al menos 6 caracteres.',null,null,'Entendido');
+                return;
+            }
+            if (password !== password2) {
+                mostrarModal('error','Contraseñas no coinciden','Las contraseñas ingresadas no son iguales.',null,null,'Entendido');
+                return;
+            }
+
+            // Verificar que no existan otros admins
+            try {
+                if (!supabaseClient) {
+                    mostrarModal('error','Error','Conexión con base de datos no disponible.',null,null,'Entendido');
+                    return;
+                }
+                const { data: existentes } = await supabaseClient.from('admins').select('id').limit(1);
+                if (existentes && existentes.length > 0) {
+                    mostrarModal('error','Registro no permitido','Ya existe una cuenta de administrador. Solo un admin existente puede crear nuevas cuentas desde el panel.',null,null,'Entendido');
+                    return;
+                }
+            } catch(e) { console.log(e); }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Creando...';
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('admins')
+                    .insert([{ nombre, email, password, rol: 'admin', activo: true }])
+                    .select();
+
+                if (error) {
+                    mostrarModal('error','Error al crear',error.message,null,null,'Entendido');
+                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus"></i> Crear cuenta Admin';
+                    return;
+                }
+
+                mostrarModal('success','¡Cuenta creada!','Tu cuenta de administrador ha sido creada correctamente. Ahora inicia sesión.',{'Email':email,'Nombre':nombre},function(){
+                    document.getElementById('adminRegistroBox').style.display = 'none';
+                    document.getElementById('admin-email').value = email;
+                    document.getElementById('admin-password').value = '';
+                    document.getElementById('admin-password').focus();
+                },'Iniciar Sesión');
+
+                document.getElementById('reg-admin-nombre').value='';
+                document.getElementById('reg-admin-email').value='';
+                document.getElementById('reg-admin-password').value='';
+                document.getElementById('reg-admin-password2').value='';
+
+            } catch(err) {
+                mostrarModal('error','Error',err.message || 'Error desconocido',null,null,'Entendido');
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus"></i> Crear cuenta Admin';
+            }
+        }
     </script>
 </body>
 </html>
