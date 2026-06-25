@@ -703,6 +703,127 @@
             .search-bar { min-width: 100%; width: 100%; }
             .section-header { flex-direction: column; align-items: stretch; }
         }
+    
+        /* ===== CALENDARIO ===== */
+        .calendario-container {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        .calendario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .calendario-nav {
+            display: flex;
+            gap: 8px;
+        }
+        .cal-nav-btn {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-dark);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cal-nav-btn:hover { background: var(--bg-light); border-color: var(--primary-blue); color: var(--primary-blue); }
+        .cal-nav-btn.hoy { padding: 0 14px; width: auto; font-size: 13px; }
+        .calendario-titulo {
+            font-size: 20px; font-weight: 700; color: var(--text-dark);
+        }
+        .calendario-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .cal-dia-header {
+            text-align: center;
+            font-size: 12px; font-weight: 600; color: var(--text-gray);
+            text-transform: uppercase;
+            padding: 8px 0;
+        }
+        .cal-dia {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            min-height: 60px;
+        }
+        .cal-dia:hover { border-color: var(--primary-blue); background: var(--light-blue); }
+        .cal-dia.seleccionado { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+        .cal-dia.seleccionado .cal-numero { color: white; }
+        .cal-dia.seleccionado .cal-pedidos-count { background: white; color: var(--primary-blue); }
+        .cal-dia.otro-mes { color: var(--text-light); background: var(--bg-light); }
+        .cal-dia.hoy { border-color: var(--primary-magenta); border-width: 2px; }
+        .cal-numero { font-size: 16px; font-weight: 600; color: var(--text-dark); }
+        .cal-pedidos-count {
+            position: absolute; bottom: 4px;
+            background: var(--primary-blue); color: white;
+            font-size: 10px; font-weight: 700;
+            padding: 2px 6px; border-radius: 10px;
+            min-width: 18px; text-align: center;
+        }
+        .cal-pedidos-count.hidden { display: none; }
+
+        /* ===== FILTROS PEDIDOS ===== */
+        .filtros-pedidos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .filtro-group { display: flex; flex-direction: column; gap: 6px; }
+        .filtro-group label { font-size: 12px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+        .filtro-group select, .filtro-group input {
+            padding: 10px 12px; border: 2px solid var(--border);
+            border-radius: 10px; font-family: 'Poppins', sans-serif;
+            font-size: 13px; color: var(--text-dark); outline: none;
+            transition: all 0.3s; background: white;
+        }
+        .filtro-group select:focus, .filtro-group input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        .filtros-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+        .btn-buscar-filtros {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-magenta));
+            color: white; border: none; border-radius: 10px;
+            padding: 10px 24px; font-family: 'Poppins', sans-serif;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-buscar-filtros:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3); }
+        .btn-limpiar-filtros {
+            background: var(--bg-light); color: var(--text-gray);
+            border: 2px solid var(--border); border-radius: 10px;
+            padding: 10px 20px; font-family: 'Poppins', sans-serif;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-limpiar-filtros:hover { border-color: var(--danger); color: var(--danger); }
+
+        /* ===== TABLA PEDIDOS DÍA ===== */
+        .pedidos-dia-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+        }
+        .pedidos-dia-titulo { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .pedidos-dia-titulo span { color: var(--primary-blue); }
+        .pedidos-dia-count { font-size: 13px; color: var(--text-gray); }
+
     </style>
 <base target="_blank">
 </head>
@@ -945,29 +1066,122 @@
             
             <!-- ===== PEDIDOS TAB ===== -->
             <div id="pedidos" class="tab-content">
+                <!-- FILTROS -->
                 <div class="section-card">
                     <div class="section-header">
-                        <h2 class="section-title">Pedidos de empresas</h2>
-                        <div class="search-bar">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="buscarPedido" placeholder="Buscar por orden, empresa o paciente..." oninput="filtrarPedidos()">
+                        <h2 class="section-title">Filtros de pedidos</h2>
+                    </div>
+                    <div class="filtros-pedidos">
+                        <div class="filtro-group">
+                            <label>Cliente (Empresa)</label>
+                            <select id="filtroCliente">
+                                <option value="">Todos los clientes</option>
+                            </select>
+                        </div>
+                        <div class="filtro-group">
+                            <label>Categoria</label>
+                            <select id="filtroCategoria">
+                                <option value="">Todas</option>
+                                <option value="convenio">Convenio</option>
+                                <option value="normal">Normal</option>
+                                <option value="emergencia">Emergencia</option>
+                            </select>
+                        </div>
+                        <div class="filtro-group">
+                            <label>Generado</label>
+                            <select id="filtroGenerado">
+                                <option value="">Todos</option>
+                                <option value="web">Web</option>
+                                <option value="presencial">Presencial</option>
+                            </select>
+                        </div>
+                        <div class="filtro-group">
+                            <label>Tipos atencion</label>
+                            <select id="filtroTipoAtencion">
+                                <option value="">Todos</option>
+                                <option value="convenio">Convenio</option>
+                                <option value="particular">Particular</option>
+                            </select>
+                        </div>
+                        <div class="filtro-group">
+                            <label>Servicios</label>
+                            <select id="filtroServicios">
+                                <option value="">Todos</option>
+                                <option value="laboratorio">Laboratorio</option>
+                                <option value="imagen">Imagen</option>
+                                <option value="consulta">Consulta</option>
+                            </select>
+                        </div>
+                        <div class="filtro-group">
+                            <label>Fecha creacion (desde)</label>
+                            <input type="date" id="filtroFechaDesde">
+                        </div>
+                        <div class="filtro-group">
+                            <label>Fecha creacion (hasta)</label>
+                            <input type="date" id="filtroFechaHasta">
+                        </div>
+                        <div class="filtro-group">
+                            <label>Medico</label>
+                            <select id="filtroMedico">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div class="filtro-group" style="min-width:250px; flex:2;">
+                            <label>Buscar</label>
+                            <input type="text" id="buscarPedido" placeholder="Numero de pedido, identificacion, nombres o apellidos...">
                         </div>
                     </div>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Orden</th>
-                                <th>Fecha creacion</th>
-                                <th>Servicio / Tipo atencion</th>
-                                <th>Cliente (Empresa)</th>
-                                <th>Paciente</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaPedidos">
-                            <tr><td colspan="6" style="text-align:center;color:var(--text-gray);">Cargando pedidos...</td></tr>
-                        </tbody>
-                    </table>
+                    <div class="filtros-row" style="margin-top:12px;">
+                        <button class="btn-buscar-filtros" onclick="aplicarFiltrosPedidos()">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        <button class="btn-limpiar-filtros" onclick="limpiarFiltrosPedidos()">
+                            <i class="fas fa-times"></i> Limpiar filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CALENDARIO -->
+                <div class="calendario-container">
+                    <div class="calendario-header">
+                        <div class="calendario-nav">
+                            <button class="cal-nav-btn" onclick="cambiarMes(-1)"><i class="fas fa-chevron-left"></i></button>
+                            <button class="cal-nav-btn hoy" onclick="irAHoy()">Hoy</button>
+                            <button class="cal-nav-btn" onclick="cambiarMes(1)"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <h3 class="calendario-titulo" id="calendarioTitulo">Junio 2026</h3>
+                        <div style="width:120px;"></div>
+                    </div>
+                    <div class="calendario-grid" id="calendarioGrid">
+                        <!-- Se genera por JS -->
+                    </div>
+                </div>
+
+                <!-- TABLA DE PEDIDOS DEL DIA SELECCIONADO -->
+                <div class="section-card" id="pedidosDiaCard" style="display:none;">
+                    <div class="pedidos-dia-header">
+                        <div>
+                            <h2 class="pedidos-dia-titulo">Pedidos del <span id="pedidosDiaFecha">24 de junio de 2026</span></h2>
+                            <p class="pedidos-dia-count" id="pedidosDiaCount">0 pedidos encontrados</p>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Orden</th>
+                                    <th>Fecha creacion</th>
+                                    <th>Servicio / Tipo atencion</th>
+                                    <th>Cliente (Empresa)</th>
+                                    <th>Paciente</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaPedidosDia">
+                                <tr><td colspan="6" style="text-align:center;color:var(--text-gray);">Selecciona un dia del calendario</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -1815,6 +2029,8 @@
         
         // ===== VARIABLES PARA PEDIDOS =====
         let todosPedidos = [];
+        let fechaCalendarioActual = new Date();
+        let diaSeleccionado = null;
 
         // ===== CARGAR PEDIDOS (ADMIN) =====
         async function cargarPedidosAdmin() {
@@ -1826,28 +2042,122 @@
                     .order('numero_orden', { ascending: false });
 
                 todosPedidos = resultados || [];
-                renderPedidos(todosPedidos);
+                renderCalendario();
+
+                // Si hay un dia seleccionado, mostrar sus pedidos
+                if (diaSeleccionado) {
+                    mostrarPedidosDelDia(diaSeleccionado);
+                }
 
             } catch (err) {
                 console.error('Error cargando pedidos:', err);
             }
         }
 
-        // ===== RENDER PEDIDOS =====
-        function renderPedidos(pedidos) {
-            const tbody = document.getElementById('tablaPedidos');
-            if (!pedidos || pedidos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-gray);">No hay pedidos registrados</td></tr>';
+        // ===== CALENDARIO =====
+        function renderCalendario() {
+            const grid = document.getElementById('calendarioGrid');
+            const titulo = document.getElementById('calendarioTitulo');
+
+            const año = fechaCalendarioActual.getFullYear();
+            const mes = fechaCalendarioActual.getMonth();
+
+            const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            titulo.textContent = nombresMeses[mes] + ' ' + año;
+
+            const primerDia = new Date(año, mes, 1).getDay();
+            const diasEnMes = new Date(año, mes + 1, 0).getDate();
+            const diasMesAnterior = new Date(año, mes, 0).getDate();
+
+            const diasSemana = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+            let html = '';
+
+            // Headers
+            diasSemana.forEach(d => {
+                html += `<div class="cal-dia-header">${d}</div>`;
+            });
+
+            // Días del mes anterior
+            const inicio = primerDia === 0 ? 6 : primerDia - 1;
+            for (let i = inicio - 1; i >= 0; i--) {
+                html += `<div class="cal-dia otro-mes"><span class="cal-numero">${diasMesAnterior - i}</span></div>`;
+            }
+
+            // Días del mes actual
+            const hoy = new Date();
+            for (let dia = 1; dia <= diasEnMes; dia++) {
+                const fechaStr = `${año}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                const pedidosDelDia = todosPedidos.filter(p => {
+                    const fechaP = new Date(p.fecha_examen).toISOString().split('T')[0];
+                    return fechaP === fechaStr;
+                });
+                const count = pedidosDelDia.length;
+                const esHoy = hoy.getFullYear() === año && hoy.getMonth() === mes && hoy.getDate() === dia;
+                const esSeleccionado = diaSeleccionado === fechaStr;
+
+                html += `<div class="cal-dia ${esHoy ? 'hoy' : ''} ${esSeleccionado ? 'seleccionado' : ''}" 
+                    onclick="seleccionarDia('${fechaStr}')">
+                    <span class="cal-numero">${dia}</span>
+                    ${count > 0 ? `<span class="cal-pedidos-count">${count}</span>` : ''}
+                </div>`;
+            }
+
+            // Días del mes siguiente
+            const totalCeldas = inicio + diasEnMes;
+            const siguiente = 42 - totalCeldas;
+            for (let dia = 1; dia <= siguiente; dia++) {
+                html += `<div class="cal-dia otro-mes"><span class="cal-numero">${dia}</span></div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        function cambiarMes(delta) {
+            fechaCalendarioActual.setMonth(fechaCalendarioActual.getMonth() + delta);
+            renderCalendario();
+        }
+
+        function irAHoy() {
+            fechaCalendarioActual = new Date();
+            const hoyStr = new Date().toISOString().split('T')[0];
+            seleccionarDia(hoyStr);
+        }
+
+        function seleccionarDia(fechaStr) {
+            diaSeleccionado = fechaStr;
+            renderCalendario();
+            mostrarPedidosDelDia(fechaStr);
+        }
+
+        function mostrarPedidosDelDia(fechaStr) {
+            const card = document.getElementById('pedidosDiaCard');
+            const tbody = document.getElementById('tablaPedidosDia');
+            const tituloFecha = document.getElementById('pedidosDiaFecha');
+            const countEl = document.getElementById('pedidosDiaCount');
+
+            const fecha = new Date(fechaStr + 'T12:00:00');
+            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            tituloFecha.textContent = fecha.toLocaleDateString('es-ES', opciones);
+
+            const pedidosDelDia = todosPedidos.filter(p => {
+                const fechaP = new Date(p.fecha_examen).toISOString().split('T')[0];
+                return fechaP === fechaStr;
+            });
+
+            countEl.textContent = pedidosDelDia.length + ' pedido(s) encontrados';
+            card.style.display = 'block';
+
+            if (pedidosDelDia.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.3;"></i>No hay pedidos para este dia</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = pedidos.map(p => {
+            tbody.innerHTML = pedidosDelDia.map(p => {
                 const fechaCreacion = new Date(p.fecha_examen).toLocaleDateString('es-ES');
                 const horaCreacion = p.fecha_subida ? new Date(p.fecha_subida).toTimeString().slice(0,5) : '';
                 const fechaCompleta = fechaCreacion + (horaCreacion ? ' ' + horaCreacion : '');
 
-                // Estado: solicitado (azul) o descargado (verde)
-                // Por ahora todo es SOLICITADO
                 const estadoClass = 'estado-pedido-solicitado';
                 const estadoTexto = 'SOLICITADO';
                 const estadoIcono = 'clock';
@@ -1864,20 +2174,27 @@
             `}).join('');
         }
 
-        // ===== FILTRAR PEDIDOS =====
-        function filtrarPedidos() {
-            const texto = document.getElementById('buscarPedido').value.toLowerCase().trim();
-            if (!texto) {
-                renderPedidos(todosPedidos);
-                return;
+        // ===== FILTROS PEDIDOS =====
+        function aplicarFiltrosPedidos() {
+            // Por ahora solo recarga el calendario con los datos actuales
+            // Los filtros se implementaran cuando tengamos las columnas necesarias
+            renderCalendario();
+            if (diaSeleccionado) {
+                mostrarPedidosDelDia(diaSeleccionado);
             }
-            const filtrados = todosPedidos.filter(p =>
-                p.numero_orden.toLowerCase().includes(texto) ||
-                (p.pacientes?.nombre || '').toLowerCase().includes(texto) ||
-                (p.pacientes?.cedula || '').toLowerCase().includes(texto) ||
-                p.examenes.toLowerCase().includes(texto)
-            );
-            renderPedidos(filtrados);
+        }
+
+        function limpiarFiltrosPedidos() {
+            document.getElementById('filtroCliente').value = '';
+            document.getElementById('filtroCategoria').value = '';
+            document.getElementById('filtroGenerado').value = '';
+            document.getElementById('filtroTipoAtencion').value = '';
+            document.getElementById('filtroServicios').value = '';
+            document.getElementById('filtroFechaDesde').value = '';
+            document.getElementById('filtroFechaHasta').value = '';
+            document.getElementById('filtroMedico').value = '';
+            document.getElementById('buscarPedido').value = '';
+            renderCalendario();
         }
 
         // ===== INICIAR =====
