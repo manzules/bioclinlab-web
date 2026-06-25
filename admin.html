@@ -995,6 +995,7 @@
             <li><button onclick="showTab('pacientes', this)"><i class="fas fa-users"></i> Pacientes</button></li>
             <li><button onclick="showTab('resultados', this)"><i class="fas fa-vial"></i> Resultados</button></li>
             <li><button onclick="showTab('pedidos', this)"><i class="fas fa-clipboard-list"></i> Pedidos</button></li>
+            <li><button onclick="showTab('catalogo', this)"><i class="fas fa-flask"></i> Catálogo</button></li>
             <li><button onclick="showTab('empresas', this)"><i class="fas fa-building"></i> Empresas</button></li>
             <li><button onclick="showTab('config', this)"><i class="fas fa-cog"></i> Configuración</button></li>
         </ul>
@@ -1180,8 +1181,12 @@
                                 </select>
                             </div>
                             <div class="form-group full-width">
-                                <label for="resExamenes">Exámenes realizados</label>
-                                <textarea id="resExamenes" placeholder="Ej: Hemograma Completo, Glucosa, Creatinina" required></textarea>
+                                <label for="resExamenSelect">Seleccionar exámenes del catálogo</label>
+                                <select id="resExamenSelect" onchange="agregarExamenAlResultado()" style="margin-bottom:8px;">
+                                    <option value="">-- Seleccionar examen --</option>
+                                </select>
+                                <textarea id="resExamenes" placeholder="Exámenes seleccionados..." required style="min-height:60px;"></textarea>
+                                <div id="examenesSeleccionadosTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
                             </div>
                         </div>
                         <div style="margin-top:16px;">
@@ -1336,6 +1341,39 @@
                 </div>
             </div>
 
+<!-- ===== CATÁLOGO TAB ===== -->
+            <div id="catalogo" class="tab-content">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Catálogo de Exámenes</h2>
+                        <button class="btn btn-primary" onclick="abrirModal('modalNuevoExamen')">
+                            <i class="fas fa-plus"></i> Nuevo examen
+                        </button>
+                    </div>
+                    <div class="search-bar" style="margin-bottom:20px;max-width:400px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="buscarExamen" placeholder="Buscar por código o nombre..." oninput="filtrarExamenes()">
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Descripción</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaExamenes">
+                                <tr><td colspan="6" style="text-align:center;color:var(--text-gray);">Cargando exámenes...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
 <!-- ===== EMPRESAS TAB ===== -->
             <div id="empresas" class="tab-content">
                 <div class="section-card">
@@ -1483,7 +1521,7 @@
 
             if (tabId === 'dashboard') cargarDashboard();
             if (tabId === 'pacientes') cargarPacientes();
-            if (tabId === 'resultados') cargarResultadosAdmin();
+            if (tabId === 'resultados') { cargarResultadosAdmin(); cargarExamenesSelect(); }
             if (tabId === 'pedidos') cargarPedidosAdmin();
             if (tabId === 'catalogo') cargarExamenes();
         }
@@ -2545,6 +2583,89 @@
             renderCalendario();
             if (diaSeleccionado) {
                 mostrarPedidosDelDia(diaSeleccionado);
+            }
+        }
+
+        // ===== FUNCIONES DE EXÁMENES =====
+        function renderExamenesTags(examenesStr) {
+            if (!examenesStr) return '<span style="color:var(--text-light);font-size:12px;">-</span>';
+            const examenes = examenesStr.split(',').map(e => e.trim()).filter(e => e);
+            if (examenes.length === 0) return '<span style="color:var(--text-light);font-size:12px;">-</span>';
+            return examenes.map(e => `<span style="display:inline-block;background:var(--light-blue);color:var(--primary-blue);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:500;margin:2px;">${e}</span>`).join('');
+        }
+
+        async function cargarExamenesSelect() {
+            try {
+                const { data: examenes, error } = await supabaseClient
+                    .from('examenes')
+                    .select('*')
+                    .order('nombre', { ascending: true });
+
+                if (error) {
+                    console.error('Error cargando exámenes para select:', error);
+                    return;
+                }
+
+                const select = document.getElementById('resExamenSelect');
+                if (select) {
+                    select.innerHTML = '<option value="">-- Seleccionar examen --</option>';
+                    (examenes || []).forEach(ex => {
+                        const precioText = ex.precio ? ` ($${parseFloat(ex.precio).toFixed(2)})` : '';
+                        select.innerHTML += `<option value="${ex.nombre}" data-precio="${ex.precio || ''}">${ex.codigo ? ex.codigo + ' - ' : ''}${ex.nombre}${precioText}</option>`;
+                    });
+                }
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }
+
+        let examenesSeleccionados = [];
+
+        function agregarExamenAlResultado() {
+            const select = document.getElementById('resExamenSelect');
+            const textarea = document.getElementById('resExamenes');
+            const tagsContainer = document.getElementById('examenesSeleccionadosTags');
+
+            if (!select || !select.value) return;
+
+            const examen = select.value;
+            const option = select.options[select.selectedIndex];
+            const precio = option.dataset.precio;
+
+            if (!examenesSeleccionados.find(e => e.nombre === examen)) {
+                examenesSeleccionados.push({ nombre: examen, precio: precio });
+            }
+
+            // Actualizar textarea
+            textarea.value = examenesSeleccionados.map(e => e.nombre).join(', ');
+
+            // Actualizar tags
+            tagsContainer.innerHTML = examenesSeleccionados.map((e, i) => 
+                `<span style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,var(--primary-blue),var(--primary-magenta));color:white;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;">
+                    ${e.nombre}${e.precio ? ' ($' + parseFloat(e.precio).toFixed(2) + ')' : ''}
+                    <button type="button" onclick="quitarExamen(${i})" style="background:none;border:none;color:white;cursor:pointer;font-size:10px;padding:0;"><i class="fas fa-times"></i></button>
+                </span>`
+            ).join('');
+
+            select.value = '';
+        }
+
+        function quitarExamen(index) {
+            examenesSeleccionados.splice(index, 1);
+            const textarea = document.getElementById('resExamenes');
+            const tagsContainer = document.getElementById('examenesSeleccionadosTags');
+
+            textarea.value = examenesSeleccionados.map(e => e.nombre).join(', ');
+
+            if (examenesSeleccionados.length === 0) {
+                tagsContainer.innerHTML = '';
+            } else {
+                tagsContainer.innerHTML = examenesSeleccionados.map((e, i) => 
+                    `<span style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,var(--primary-blue),var(--primary-magenta));color:white;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;">
+                        ${e.nombre}${e.precio ? ' ($' + parseFloat(e.precio).toFixed(2) + ')' : ''}
+                        <button type="button" onclick="quitarExamen(${i})" style="background:none;border:none;color:white;cursor:pointer;font-size:10px;padding:0;"><i class="fas fa-times"></i></button>
+                    </span>`
+                ).join('');
             }
         }
 
