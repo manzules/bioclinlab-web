@@ -1029,7 +1029,7 @@ async function cargarResultados() {
                             : o.estado === 'anulado'
                                 ? `<span style="color:var(--danger);font-size:13px;font-weight:600;"><i class="fas fa-ban"></i> Anulada</span>`
                                 : `<button class="btn-icon edit" onclick="editarOrden('${o.numero_orden}')" title="Editar"><i class="fas fa-edit"></i></button>
-                                   <button class="btn-icon delete" onclick="anularOrden('${o.numero_orden}')" title="Anular solicitud"><i class="fas fa-times-circle"></i></button>`
+                                   <button class="btn-anular" onclick="abrirModalAnular('${o.numero_orden}')"><i class="fas fa-ban"></i> Anular</button>`
                         }
                     </div>
                 </td>
