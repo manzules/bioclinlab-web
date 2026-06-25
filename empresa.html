@@ -441,6 +441,7 @@
     </style>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -704,124 +705,29 @@
             <div class="section-card">
                 <div class="section-header">
                     <div>
-                        <h2 class="section-title">Catalogo de pruebas</h2>
-                        <p class="section-subtitle">Conoce todas las pruebas disponibles en BIOCLINLAB</p>
+                        <h2 class="section-title">Catálogo de Exámenes</h2>
+                        <p class="section-subtitle">Consulta todos los exámenes disponibles en BIOCLINLAB</p>
                     </div>
                 </div>
-                <div class="catalogo-grid">
-                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
-                        <div class="catalogo-icon hemato"><i class="fas fa-vial"></i></div>
-                        <h4>Hematologia Completa</h4>
-                        <p>Pruebas relacionadas con sangre, globulos rojos, blancos, plaquetas y coagulacion.</p>
-                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>8 pruebas</span>
-                        <div class="catalogo-pruebas-list">
-                            <ul>
-                                <li><i class="fas fa-check"></i> Hemograma completo (CBC)</li>
-                                <li><i class="fas fa-check"></i> Recuento de globulos rojos</li>
-                                <li><i class="fas fa-check"></i> Recuento de globulos blancos</li>
-                                <li><i class="fas fa-check"></i> Recuento de plaquetas</li>
-                                <li><i class="fas fa-check"></i> Hemoglobina y hematocrito</li>
-                                <li><i class="fas fa-check"></i> Formula leucocitaria diferencial</li>
-                                <li><i class="fas fa-check"></i> VHS (Velocidad de sedimentacion)</li>
-                                <li><i class="fas fa-check"></i> Grupo sanguineo y factor Rh</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
-                        <div class="catalogo-icon bioquim"><i class="fas fa-tint"></i></div>
-                        <h4>Bioquimica Sanguinea</h4>
-                        <p>Analisis de metabolitos, enzimas, lipidos y electrolitos en sangre.</p>
-                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>9 pruebas</span>
-                        <div class="catalogo-pruebas-list">
-                            <ul>
-                                <li><i class="fas fa-check"></i> Glucosa en ayunas y postprandial</li>
-                                <li><i class="fas fa-check"></i> Urea y creatinina</li>
-                                <li><i class="fas fa-check"></i> Acido urico</li>
-                                <li><i class="fas fa-check"></i> Perfil lipidico completo</li>
-                                <li><i class="fas fa-check"></i> Transaminasas (AST, ALT)</li>
-                                <li><i class="fas fa-check"></i> Fosfatasa alcalina y GGT</li>
-                                <li><i class="fas fa-check"></i> Bilirrubina total y fraccionada</li>
-                                <li><i class="fas fa-check"></i> Electrolitos (Na, K, Cl, Ca)</li>
-                                <li><i class="fas fa-check"></i> Proteinas totales y fracciones</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
-                        <div class="catalogo-icon hormonal"><i class="fas fa-dna"></i></div>
-                        <h4>Pruebas Hormonales</h4>
-                        <p>Evaluacion de funcion endocrina y metabolismo hormonal.</p>
-                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>8 pruebas</span>
-                        <div class="catalogo-pruebas-list">
-                            <ul>
-                                <li><i class="fas fa-check"></i> TSH, T3 libre, T4 libre</li>
-                                <li><i class="fas fa-check"></i> Prolactina</li>
-                                <li><i class="fas fa-check"></i> Estradiol y progesterona</li>
-                                <li><i class="fas fa-check"></i> Testosterona total y libre</li>
-                                <li><i class="fas fa-check"></i> FSH y LH</li>
-                                <li><i class="fas fa-check"></i> HCG (prueba de embarazo)</li>
-                                <li><i class="fas fa-check"></i> Cortisol</li>
-                                <li><i class="fas fa-check"></i> Insulina y HOMA-IR</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
-                        <div class="catalogo-icon inmuno"><i class="fas fa-shield-virus"></i></div>
-                        <h4>Inmunologia</h4>
-                        <p>Deteccion de anticuerpos, marcadores tumorales y pruebas inmunologicas.</p>
-                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>9 pruebas</span>
-                        <div class="catalogo-pruebas-list">
-                            <ul>
-                                <li><i class="fas fa-check"></i> Factor reumatoide (FR)</li>
-                                <li><i class="fas fa-check"></i> Anticuerpos anti-CCP</li>
-                                <li><i class="fas fa-check"></i> ANA (Anticuerpos antinucleares)</li>
-                                <li><i class="fas fa-check"></i> Anti-DNA</li>
-                                <li><i class="fas fa-check"></i> Inmunoglobulinas (IgA, IgG, IgM)</li>
-                                <li><i class="fas fa-check"></i> Proteina C reactiva (PCR)</li>
-                                <li><i class="fas fa-check"></i> Procalcitonina</li>
-                                <li><i class="fas fa-check"></i> Marcadores tumorales (CEA, CA 19-9, PSA)</li>
-                                <li><i class="fas fa-check"></i> Pruebas COVID-19</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
-                        <div class="catalogo-icon micro"><i class="fas fa-bacterium"></i></div>
-                        <h4>Microbiologia</h4>
-                        <p>Cultivos, identificacion bacteriana y pruebas de sensibilidad.</p>
-                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>9 pruebas</span>
-                        <div class="catalogo-pruebas-list">
-                            <ul>
-                                <li><i class="fas fa-check"></i> Urocultivo con antibiograma</li>
-                                <li><i class="fas fa-check"></i> Coprocultivo</li>
-                                <li><i class="fas fa-check"></i> Cultivo de secreciones</li>
-                                <li><i class="fas fa-check"></i> Hemocultivo</li>
-                                <li><i class="fas fa-check"></i> Tincion de Gram</li>
-                                <li><i class="fas fa-check"></i> Tincion de Ziehl-Neelsen (BAAR)</li>
-                                <li><i class="fas fa-check"></i> Examen directo de hongos (KOH)</li>
-                                <li><i class="fas fa-check"></i> Pruebas de sensibilidad antimicrobiana</li>
-                                <li><i class="fas fa-check"></i> Identificacion bacteriana automatizada</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="catalogo-card" onclick="toggleCatalogo(this)">
-                        <div class="catalogo-icon especial"><i class="fas fa-clipboard-check"></i></div>
-                        <h4>Pruebas Especiales</h4>
-                        <p>Pruebas especializadas de alto valor diagnostico.</p>
-                        <span class="pruebas-count"><i class="fas fa-flask" style="margin-right:4px;"></i>10 pruebas</span>
-                        <div class="catalogo-pruebas-list">
-                            <ul>
-                                <li><i class="fas fa-check"></i> HbA1c (Hemoglobina glicosilada)</li>
-                                <li><i class="fas fa-check"></i> Ferritina</li>
-                                <li><i class="fas fa-check"></i> Vitamina D (25-OH)</li>
-                                <li><i class="fas fa-check"></i> PSA total y libre</li>
-                                <li><i class="fas fa-check"></i> Prueba de embarazo en sangre</li>
-                                <li><i class="fas fa-check"></i> Troponina I</li>
-                                <li><i class="fas fa-check"></i> BNP / NT-proBNP</li>
-                                <li><i class="fas fa-check"></i> Dimero D</li>
-                                <li><i class="fas fa-check"></i> Homocisteina</li>
-                                <li><i class="fas fa-check"></i> Perfil tiroideo extendido</li>
-                            </ul>
-                        </div>
-                    </div>
+                <div class="search-box" style="margin-bottom:20px;max-width:400px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="buscarExamenEmpresa" placeholder="Buscar por código o nombre..." oninput="filtrarExamenesEmpresa()">
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaExamenesEmpresa">
+                            <tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Cargando exámenes...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -864,7 +770,7 @@ function showTab(tabId, linkEl) {
     const titles = {
         resultados: { title: 'Resultados', breadcrumb: 'Portal de Empresas / Resultados' },
         ingresar: { title: 'Ingresar Orden', breadcrumb: 'Portal de Empresas / Ingresar Orden' },
-        catalogo: { title: 'Catalogo', breadcrumb: 'Portal de Empresas / Catalogo' }
+        catalogo: { title: 'Catálogo de Exámenes', breadcrumb: 'Portal de Empresas / Catálogo' }
     };
     document.getElementById('pageTitle').textContent = titles[tabId].title;
     document.getElementById('pageBreadcrumb').textContent = titles[tabId].breadcrumb;
@@ -873,6 +779,7 @@ function showTab(tabId, linkEl) {
     if (tabId === 'ingresar') {
         document.getElementById('ordFecha').value = new Date().toISOString().split('T')[0];
     }
+    if (tabId === 'catalogo') cargarExamenesEmpresa();
 }
 
 function toggleSidebar() {
@@ -1262,6 +1169,77 @@ function toggleCatalogo(card) {
     const list = card.querySelector('.catalogo-pruebas-list');
     list.classList.toggle('show');
     card.classList.toggle('active');
+}
+
+// ===== CATÁLOGO DE EXÁMENES PARA EMPRESA =====
+let todosExamenesEmpresa = [];
+
+async function cargarExamenesEmpresa() {
+    try {
+        const { data: examenes, error } = await supabaseClient
+            .from('examenes')
+            .select('*')
+            .order('nombre', { ascending: true });
+
+        if (error) {
+            console.error('Error cargando exámenes:', error);
+            document.getElementById('tablaExamenesEmpresa').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-exclamation-circle" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.3;"></i>Error al cargar exámenes</td></tr>';
+            return;
+        }
+
+        todosExamenesEmpresa = examenes || [];
+        renderExamenesEmpresa(todosExamenesEmpresa);
+
+    } catch (err) {
+        console.error('Error:', err);
+        document.getElementById('tablaExamenesEmpresa').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-exclamation-circle" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.3;"></i>Error de conexión</td></tr>';
+    }
+}
+
+function renderExamenesEmpresa(examenes) {
+    const tbody = document.getElementById('tablaExamenesEmpresa');
+    if (!examenes || examenes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:40px;"><i class="fas fa-flask" style="font-size:32px;display:block;margin-bottom:12px;opacity:0.3;"></i>No hay exámenes registrados</td></tr>';
+        return;
+    }
+
+    const categorias = {
+        hematologia: 'Hematología',
+        quimica: 'Química Clínica',
+        inmunologia: 'Inmunología',
+        microbiologia: 'Microbiología',
+        urianalisis: 'Urianálisis',
+        hormonas: 'Hormonas',
+        especial: 'Pruebas Especiales',
+        otros: 'Otros'
+    };
+
+    tbody.innerHTML = examenes.map(e => {
+        const catDisplay = categorias[e.categoria] || e.categoria || '-';
+        const precioDisplay = e.precio ? '$' + parseFloat(e.precio).toFixed(2) : '-';
+        return `
+        <tr>
+            <td><strong style="color:var(--primary-blue);">${e.codigo || '-'}</strong></td>
+            <td>${e.nombre}</td>
+            <td><span class="estado-badge" style="background:var(--light-blue);color:var(--primary-blue);">${catDisplay}</span></td>
+            <td>${precioDisplay}</td>
+            <td>${e.descripcion || '-'}</td>
+        </tr>
+    `}).join('');
+}
+
+function filtrarExamenesEmpresa() {
+    const texto = document.getElementById('buscarExamenEmpresa').value.toLowerCase().trim();
+    if (!texto) {
+        renderExamenesEmpresa(todosExamenesEmpresa);
+        return;
+    }
+    const filtrados = todosExamenesEmpresa.filter(e =>
+        (e.codigo && e.codigo.toLowerCase().includes(texto)) ||
+        e.nombre.toLowerCase().includes(texto) ||
+        (e.categoria && e.categoria.toLowerCase().includes(texto))
+    );
+    renderExamenesEmpresa(filtrados);
 }
 
 // Set default dates
