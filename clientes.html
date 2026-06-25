@@ -52,7 +52,7 @@
         .portal-title { font-size: 26px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
         .portal-subtitle { font-size: 14px; color: var(--text-gray); margin-bottom: 35px; }
         .user-type-label { font-size: 13px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 18px; }
-        .user-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 30px; }
+        .user-type-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 30px; }
         .user-type-btn {
             background: var(--bg-light); border: 2px solid transparent; border-radius: 16px;
             padding: 28px 16px; cursor: pointer; transition: all 0.3s ease;
@@ -198,7 +198,9 @@
         @media (max-width: 480px) {
             .portal-container { padding: 40px 24px; border-radius: 24px; }
             .portal-title { font-size: 22px; }
-            .user-type-btn { padding: 22px 12px; }
+            .user-type-btn { padding: 18px 8px; }
+            .user-type-btn i { font-size: 24px; }
+            .user-type-btn span { font-size: 12px; }
             .modal-box { padding: 32px 24px; }
         }
     </style>
